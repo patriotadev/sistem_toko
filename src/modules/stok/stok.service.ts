@@ -61,5 +61,6 @@ class StokService {
         })
         return result;
     }
-
 }
+
+export default StokService;
