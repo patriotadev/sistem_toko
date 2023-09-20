@@ -1,0 +1,267 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Location {
+  id          String       @id @default(cuid())
+  description String
+  User        User[]
+  StokBarang  StokBarang[]
+  Penjualan   Penjualan[]
+}
+
+model Role {
+  id          String     @id @default(cuid())
+  description String
+  User        User[]
+  RoleMenu    RoleMenu[]
+}
+
+model User {
+  id           String         @id @default(cuid())
+  name         String
+  email        String         @unique
+  password     String
+  RefreshToken RefreshToken[]
+  role         Role           @relation(fields: [roleId], references: [id])
+  roleId       String
+  location     Location       @relation(fields: [locationId], references: [id])
+  locationId   String
+}
+
+model RefreshToken {
+  id          String   @id @default(cuid())
+  refeshToken String
+  expiredAt   DateTime
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+}
+
+model RoleMenu {
+  id     String @id @default(cuid())
+  role   Role   @relation(fields: [roleId], references: [id])
+  roleId String
+  menu   Menu   @relation(fields: [menuId], references: [id])
+  menuId String
+}
+
+model Menu {
+  id          String     @id @default(cuid())
+  description String
+  RoleMenu    RoleMenu[]
+  SubMenu     SubMenu[]
+}
+
+model SubMenu {
+  id          String @id @default(cuid())
+  description String
+  parent      Menu   @relation(fields: [parentId], references: [id])
+  parentId    String
+}
+
+model StokBarang {
+  id         String    @id @default(cuid())
+  nama       String
+  jumlah     Int
+  hargaModal Int
+  hargaJual  Int
+  createdBy  String
+  createdAt  DateTime  @default(now())
+  updatedBy  String?
+  updatedAt  DateTime? @default(now())
+  location   Location  @relation(fields: [locationId], references: [id])
+  locationId String
+}
+
+model Pt {
+  id        String    @id @default(cuid())
+  nama      String
+  alamat    String
+  telepon   String
+  createdBy String
+  createdAt DateTime  @default(now())
+  updatedBy String?
+  updatedAt DateTime? @default(now())
+  Project   Project[]
+  Po        Po[]
+}
+
+model Project {
+  id        String    @id @default(cuid())
+  nama      String
+  createdBy String
+  createdAt DateTime  @default(now())
+  updatedBy String?
+  updatedAt DateTime? @default(now())
+  Pt        Pt        @relation(fields: [ptId], references: [id])
+  ptId      String
+  Po        Po[]
+}
+
+model Po {
+  id           String         @id @default(cuid())
+  tanggal      DateTime
+  createdBy    String
+  createdAt    DateTime       @default(now())
+  updatedBy    String?
+  updatedAt    DateTime?      @default(now())
+  Pt           Pt             @relation(fields: [ptId], references: [id])
+  ptId         String
+  Project      Project        @relation(fields: [projectId], references: [id])
+  projectId    String
+  SuratJalanPo SuratJalanPo[]
+  InvoicePo    InvoicePo[]
+  BarangPo     BarangPo[]
+}
+
+model SuratJalanPo {
+  id                 String               @id @default(cuid())
+  nomor              String
+  namaSupir          String
+  createdBy          String
+  createdAt          DateTime             @default(now())
+  updatedBy          String?
+  updatedAt          DateTime?            @default(now())
+  Po                 Po                   @relation(fields: [poId], references: [id])
+  poId               String
+  BarangSuratJalanPo BarangSuratJalanPo[]
+}
+
+model TandaTerimaNota {
+  id        String      @id @default(cuid())
+  nomor     String
+  tanggal   DateTime
+  createdBy String
+  createdAt DateTime    @default(now())
+  updatedBy String?
+  updatedAt DateTime?   @default(now())
+  InvoicePo InvoicePo[]
+}
+
+model InvoicePo {
+  id                String          @id @default(cuid())
+  nomor             String
+  createdBy         String
+  createdAt         DateTime        @default(now())
+  updatedBy         String?
+  updatedAt         DateTime?       @default(now())
+  po                Po              @relation(fields: [poId], references: [id])
+  poId              String
+  tandaTerimaNota   TandaTerimaNota @relation(fields: [tandaTerimaNotaId], references: [id])
+  tandaTerimaNotaId String
+}
+
+model BarangPo {
+  id          String    @id @default(cuid())
+  nama        String
+  qty         Int
+  satuan      String
+  discount    Int
+  harga       Int
+  jumlahHarga Int
+  createdBy   String
+  createdAt   DateTime  @default(now())
+  updatedBy   String?
+  updatedAt   DateTime? @default(now())
+  po          Po        @relation(fields: [poId], references: [id])
+  poId        String
+}
+
+model BarangSuratJalanPo {
+  id             String       @id @default(cuid())
+  nama           String
+  qty            Int
+  satuan         Int
+  createdBy      String
+  createdAt      DateTime     @default(now())
+  updatedBy      String?
+  updatedAt      DateTime?    @default(now())
+  suratJalanPo   SuratJalanPo @relation(fields: [suratJalanPoId], references: [id])
+  suratJalanPoId String
+}
+
+model Penjualan {
+  id                  String                @id @default(cuid())
+  namaPelanggan       String
+  kontakPelanggan     String
+  alamatPelanggan     String
+  jumlahTotal         Int
+  createdBy           String
+  createdAt           DateTime              @default(now())
+  updatedBy           String?
+  updatedAt           DateTime?             @default(now())
+  location            Location              @relation(fields: [locationId], references: [id])
+  locationId          String
+  BarangPenjualan     BarangPenjualan[]
+  SuratJalanPenjualan SuratJalanPenjualan[]
+  Pembayaran          Pembayaran[]
+  InvoicePenjualan    InvoicePenjualan[]
+}
+
+model BarangPenjualan {
+  id          String    @id @default(cuid())
+  nama        String
+  qty         Int
+  satuan      String
+  discount    Int
+  harga       Int
+  jumlahHarga Int
+  createdBy   String
+  createdAt   DateTime  @default(now())
+  updatedBy   String?
+  updatedAt   DateTime? @default(now())
+  penjualan   Penjualan @relation(fields: [penjualanId], references: [id])
+  penjualanId String
+}
+
+model SuratJalanPenjualan {
+  id                        String                      @id @default(cuid())
+  nomor                     String
+  namaSupir                 String
+  createdBy                 String
+  createdAt                 DateTime                    @default(now())
+  updatedBy                 String?
+  updatedAt                 DateTime?                   @default(now())
+  penjualan                 Penjualan                   @relation(fields: [penjualanId], references: [id])
+  penjualanId               String
+  BarangSuratJalanPenjualan BarangSuratJalanPenjualan[]
+}
+
+model BarangSuratJalanPenjualan {
+  id                    String              @id @default(cuid())
+  nama                  String
+  qty                   Int
+  satuan                Int
+  createdBy             String
+  createdAt             DateTime            @default(now())
+  updatedBy             String?
+  updatedAt             DateTime?           @default(now())
+  suratJalanPenjualan   SuratJalanPenjualan @relation(fields: [suratJalanPenjualanId], references: [id])
+  suratJalanPenjualanId String
+}
+
+model Pembayaran {
+  id          String    @id @default(cuid())
+  jumlah      Int
+  sisa        Int
+  status      String
+  isApprove   Boolean
+  tanggal     DateTime
+  penjualan   Penjualan @relation(fields: [penjualanId], references: [id])
+  penjualanId String
+}
+
+model InvoicePenjualan {
+  id          String    @id @default(cuid())
+  nomor       String
+  penjualan   Penjualan @relation(fields: [penjualanId], references: [id])
+  penjualanId String
+}
