@@ -1,9 +1,9 @@
 -- CreateTable
-CREATE TABLE "Location" (
+CREATE TABLE "Toko" (
     "id" TEXT NOT NULL,
     "description" TEXT NOT NULL,
 
-    CONSTRAINT "Location_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Toko_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -21,7 +21,7 @@ CREATE TABLE "User" (
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "roleId" TEXT NOT NULL,
-    "locationId" TEXT NOT NULL,
+    "tokoId" TEXT NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -67,13 +67,14 @@ CREATE TABLE "StokBarang" (
     "id" TEXT NOT NULL,
     "nama" TEXT NOT NULL,
     "jumlah" INTEGER NOT NULL,
+    "satuan" TEXT NOT NULL,
     "hargaModal" INTEGER NOT NULL,
     "hargaJual" INTEGER NOT NULL,
     "createdBy" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedBy" TEXT,
     "updatedAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
-    "locationId" TEXT NOT NULL,
+    "tokoId" TEXT NOT NULL,
 
     CONSTRAINT "StokBarang_pkey" PRIMARY KEY ("id")
 );
@@ -204,7 +205,7 @@ CREATE TABLE "Penjualan" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedBy" TEXT,
     "updatedAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
-    "locationId" TEXT NOT NULL,
+    "tokoId" TEXT NOT NULL,
 
     CONSTRAINT "Penjualan_pkey" PRIMARY KEY ("id")
 );
@@ -285,7 +286,7 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 ALTER TABLE "User" ADD CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_locationId_fkey" FOREIGN KEY ("locationId") REFERENCES "Location"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "User" ADD CONSTRAINT "User_tokoId_fkey" FOREIGN KEY ("tokoId") REFERENCES "Toko"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "RefreshToken" ADD CONSTRAINT "RefreshToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -300,7 +301,7 @@ ALTER TABLE "RoleMenu" ADD CONSTRAINT "RoleMenu_menuId_fkey" FOREIGN KEY ("menuI
 ALTER TABLE "SubMenu" ADD CONSTRAINT "SubMenu_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "Menu"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "StokBarang" ADD CONSTRAINT "StokBarang_locationId_fkey" FOREIGN KEY ("locationId") REFERENCES "Location"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "StokBarang" ADD CONSTRAINT "StokBarang_tokoId_fkey" FOREIGN KEY ("tokoId") REFERENCES "Toko"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Project" ADD CONSTRAINT "Project_ptId_fkey" FOREIGN KEY ("ptId") REFERENCES "Pt"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -327,7 +328,7 @@ ALTER TABLE "BarangPo" ADD CONSTRAINT "BarangPo_poId_fkey" FOREIGN KEY ("poId") 
 ALTER TABLE "BarangSuratJalanPo" ADD CONSTRAINT "BarangSuratJalanPo_suratJalanPoId_fkey" FOREIGN KEY ("suratJalanPoId") REFERENCES "SuratJalanPo"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Penjualan" ADD CONSTRAINT "Penjualan_locationId_fkey" FOREIGN KEY ("locationId") REFERENCES "Location"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Penjualan" ADD CONSTRAINT "Penjualan_tokoId_fkey" FOREIGN KEY ("tokoId") REFERENCES "Toko"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "BarangPenjualan" ADD CONSTRAINT "BarangPenjualan_penjualanId_fkey" FOREIGN KEY ("penjualanId") REFERENCES "Penjualan"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
