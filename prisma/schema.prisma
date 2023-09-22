@@ -10,7 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Location {
+model Toko {
   id          String       @id @default(cuid())
   description String
   User        User[]
@@ -33,8 +33,8 @@ model User {
   RefreshToken RefreshToken[]
   role         Role           @relation(fields: [roleId], references: [id])
   roleId       String
-  location     Location       @relation(fields: [locationId], references: [id])
-  locationId   String
+  toko         Toko           @relation(fields: [tokoId], references: [id])
+  tokoId       String
 }
 
 model RefreshToken {
@@ -71,14 +71,15 @@ model StokBarang {
   id         String    @id @default(cuid())
   nama       String
   jumlah     Int
+  satuan     String
   hargaModal Int
   hargaJual  Int
   createdBy  String
   createdAt  DateTime  @default(now())
   updatedBy  String?
   updatedAt  DateTime? @default(now())
-  location   Location  @relation(fields: [locationId], references: [id])
-  locationId String
+  toko       Toko      @relation(fields: [tokoId], references: [id])
+  tokoId     String
 }
 
 model Pt {
@@ -198,8 +199,8 @@ model Penjualan {
   createdAt           DateTime              @default(now())
   updatedBy           String?
   updatedAt           DateTime?             @default(now())
-  location            Location              @relation(fields: [locationId], references: [id])
-  locationId          String
+  toko                Toko                  @relation(fields: [tokoId], references: [id])
+  tokoId              String
   BarangPenjualan     BarangPenjualan[]
   SuratJalanPenjualan SuratJalanPenjualan[]
   Pembayaran          Pembayaran[]
