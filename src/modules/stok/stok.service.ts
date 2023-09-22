@@ -4,15 +4,16 @@ const StokBarang = new PrismaClient().stokBarang;
 
 class StokService {
     async create(payload: StokDTO) {
-        const {nama, jumlah, hargaModal, hargaJual, createdBy, locationId} = payload
+        const {nama, jumlah, satuan, hargaModal, hargaJual, createdBy, tokoId} = payload
         const result = await StokBarang.create({
             data: {
                 nama,
                 jumlah,
+                satuan,
                 hargaModal,
                 hargaJual,
                 createdBy,
-                locationId
+                tokoId
             }
         })
         return result;
@@ -21,7 +22,7 @@ class StokService {
     async findAll() {
         const result = await StokBarang.findMany({
             include: {
-                location: true
+                toko: true
             }
         })
         return result;
@@ -31,13 +32,16 @@ class StokService {
         const result = await StokBarang.findUnique({
             where : {
                 id
+            },
+            include: {
+                toko: true
             }
         })
         return result;
     }
 
     async updateOneById(id: string, payload: StokDTO) {
-        const { nama, jumlah, hargaModal, hargaJual, updatedBy, locationId } = payload
+        const { nama, jumlah, satuan, hargaModal, hargaJual, updatedBy, tokoId } = payload
         const result = await StokBarang.update({
             where: {
                 id
@@ -45,10 +49,11 @@ class StokService {
             data: {
                 nama,
                 jumlah,
+                satuan,
                 hargaModal,
                 hargaJual,
                 updatedBy,
-                locationId
+                tokoId
             }
         })
     }

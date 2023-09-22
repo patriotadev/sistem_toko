@@ -4,12 +4,11 @@ import StokService from './stok.service';
 export async function createStok(req: Request, res: Response) {
     try {
         const stokService = new StokService();
-        const result = await stokService.create(req.body);
+        await stokService.create(req.body);
         return res.status(201).send({
             'status': 'success',
             'code': 201,
             'message': 'Data has been added successfully.',
-            'data': result
         })
     } catch (error) {
         console.log(error);
@@ -28,7 +27,6 @@ export async function getAllStok(req: Request, res: Response) {
         res.status(200).send({
             'status': 'success',
             'code': 200,
-            'message': 'Data has been fetched successfully',
             'data': result
         })
     } catch (error) {
@@ -48,7 +46,6 @@ export async function getStokById(req: Request, res: Response) {
         res.status(200).send({
             'status': 'success',
             'code': 200,
-            'message': 'Data has been fetched successfully',
             'data': result
         })
     } catch (error) {
@@ -64,12 +61,11 @@ export async function getStokById(req: Request, res: Response) {
 export async function updateStokById(req: Request, res: Response) {
     try {
         const stokService = new StokService();
-        const result = await stokService.updateOneById(req.body.id, req.body);
+        await stokService.updateOneById(req.body.id, req.body);
         res.status(200).send({
             'status': 'success',
             'code': 200,
             'message': 'Data has been updated successfully',
-            'data': result
         })
     } catch (error) {
         console.log(error);
@@ -84,12 +80,11 @@ export async function updateStokById(req: Request, res: Response) {
 export async function deleteStokById(req: Request, res: Response) {
     try {
         const stokService = new StokService();
-        const result = await stokService.deleteOneById(req.body);
+        await stokService.deleteOneById(req.body.id);
         res.status(200).send({
             'status': 'success',
             'code': 200,
             'message': 'Data has been deleted successfully',
-            'data': result
         })
     } catch (error) {
         console.log(error);
