@@ -38,11 +38,11 @@ model User {
 }
 
 model RefreshToken {
-  id          String   @id @default(cuid())
-  refeshToken String
-  expiredAt   DateTime
-  user        User     @relation(fields: [userId], references: [id])
-  userId      String
+  id           String   @id @default(cuid())
+  refreshToken String   @unique
+  expiredAt    DateTime
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String
 }
 
 model RoleMenu {
