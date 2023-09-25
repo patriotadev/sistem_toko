@@ -14,6 +14,6 @@ app.use(AppRouter);
 
 app.listen(PORT, () => {
     console.log('\x1b[36m',`Server is running on ${process.env.HOST_URL}:${process.env.PORT}`);
-}).on("error", () => {
-    console.log('\x1b[31m','Something wrong.. server error!')
+}).on("error", (e) => {
+    console.log('\x1b[31m', e);
 })
