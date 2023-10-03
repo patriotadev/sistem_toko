@@ -1,5 +1,6 @@
 import {Response, Request, NextFunction} from 'express';
 import StokService from './stok.service';
+import { IPaginationQuery } from './interfaces/stok.interface';
 
 export async function createStok(req: Request, res: Response) {
     try {
@@ -22,8 +23,9 @@ export async function createStok(req: Request, res: Response) {
 
 export async function getAllStok(req: Request, res: Response) {
     try {
+        console.log(req.query);
         const stokService = new StokService();
-        const result = await stokService.findAll();
+        const result = await stokService.findAll(req.query as unknown as IPaginationQuery);
         res.status(200).send({
             'status': 'success',
             'code': 200,

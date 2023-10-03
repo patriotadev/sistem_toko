@@ -32,6 +32,7 @@ export async function register(req: Request, res: Response) {
 
 export async function login(req: Request, res: Response, next: NextFunction) {
     try {
+        console.log("payload", req.body);
         const {error} = LoginValidation(req.body);
         if (error) return res.status(400).send({
             "message": "Failed",
@@ -44,8 +45,9 @@ export async function login(req: Request, res: Response, next: NextFunction) {
             const refreshToken = authService.generateRefreshToken(result.user);
             await authService.postRefreshTokenToList(refreshToken, result.user);
 
-            return res.status(201).send({
-                "message": "Success",
+            return res.status(200).send({
+                "status": "Success",
+                "code": 200,
                 "data": {
                     accessToken,
                     refreshToken
@@ -53,13 +55,15 @@ export async function login(req: Request, res: Response, next: NextFunction) {
             });
         }
         return res.status(400).send({
-            "message": "Failed",
-            "error": 'User not found.'
+            "status": "Failed",
+            "code": 400,
+            "error": 'Oops.. akun tidak ditemukan'
         })
     } catch (error) {
         res.status(500).send({
-            "message": "Failed",
-            "error": 'Internal server error.'
+            "Status": "Failed",
+            "code": 500,
+            "error": error
         })
     }
 }

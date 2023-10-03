@@ -6,6 +6,8 @@ export const RegisterValidation = (payload: RegisterInterface) => {
         name: Joi.string().max(255).required(),
         email: Joi.string().email().required(),
         password: Joi.string().min(6).max(255).required(),
+        tokoId: Joi.string().max(255).required(),
+        roleId: Joi.string().max(255).required()
     });
 
     return schema.validate(payload);

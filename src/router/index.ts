@@ -4,6 +4,14 @@ import StokRouter from '../modules/stok/stok.route';
 import TokoRouter from '../modules/toko/toko.route';
 import PtRouter from '../modules/pt/pt.route';
 import RoleRouter from '../modules/role/role.route';
+import ProjectRouter from '../modules/project/project.route';
+import PoRouter from '../modules/po/po.route';
+import SuratJalanPoRouter from '../modules/surat-jalan-po/surat-jalan-po.route';
+import BarangPoRouter from '../modules/barang-po/barang-po.route';
+import InvoicePoRouter from '../modules/invoice-po/invoice-po.route';
+import TandaTerimaNotaRouter from '../modules/tanda-terima-nota/tanda-terima-nota.route';
+import BarangSuratJalanPoRouter from '../modules/barang-surat-jalan-po/barang-surat-jalan-po.route';
+import UserRouter from '../modules/user/user.route';
 
 const router = express.Router();
 
@@ -16,6 +24,14 @@ router.use('/api/stok', StokRouter);
 router.use('/api/toko', TokoRouter);
 router.use('/api/pt', PtRouter);
 router.use('/api/role', RoleRouter);
+router.use('/api/project', ProjectRouter);
+router.use('/api/po', PoRouter);
+router.use('/api/surat-jalan-po', SuratJalanPoRouter);
+router.use('/api/barang-po', BarangPoRouter);
+router.use('/api/invoice-po', InvoicePoRouter);
+router.use('/api/tanda-terima-nota', TandaTerimaNotaRouter);
+router.use('/api/barang-surat-jalan-po', BarangSuratJalanPoRouter);
+router.use('/api/user', UserRouter);
 
 router.use((req: Request, res: Response) => {
     res.status(400).send('Invalid route.');

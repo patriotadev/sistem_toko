@@ -10,7 +10,7 @@ export default class AuthService {
     generateAccessToken(payload: AuthDTO) {
         const token = Jwt.sign({id: payload.id, name: payload.name, email: payload.email},
             process.env.ACCESS_TOKEN as string,
-            { expiresIn: "30s" }
+            { expiresIn: "15m" }
         );
         return token;
     }
@@ -18,7 +18,7 @@ export default class AuthService {
     generateRefreshToken(payload: AuthDTO) {
         const token = Jwt.sign({id: payload.id, name: payload.name, email: payload.email},
             process.env.REFRESH_TOKEN as string,
-            { expiresIn: "1m" }
+            { expiresIn: "2d" }
         );
         return token;
     }
@@ -38,7 +38,7 @@ export default class AuthService {
             await RefreshToken.create({
                 data: {
                     refreshToken,
-                    expiredAt: '1d',
+                    expiredAt: new Date(),
                     userId: payload.id,
                 }
             });

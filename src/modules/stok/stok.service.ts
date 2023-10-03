@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import StokDTO from "./dto/stok.dto";
+import {IPaginationQuery} from './interfaces/stok.interface';
 const StokBarang = new PrismaClient().stokBarang;
 
 class StokService {
@@ -19,10 +20,17 @@ class StokService {
         return result;
     }
 
-    async findAll() {
+    async findAll({page, perPage}: IPaginationQuery) {
+        const skipPage = Number(page) * 10 - 10;
         const result = await StokBarang.findMany({
+            skip: skipPage,
+            take: Number(perPage),
+
             include: {
                 toko: true
+            },
+            orderBy: {
+                createdAt: 'desc'
             }
         })
         return result;
