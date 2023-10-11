@@ -1,6 +1,6 @@
 import {Response, Request, NextFunction} from 'express';
 import StokService from './stok.service';
-import { IPaginationQuery } from './interfaces/stok.interface';
+import { IParamsQuery } from './interfaces/stok.interface';
 
 export async function createStok(req: Request, res: Response) {
     try {
@@ -25,12 +25,15 @@ export async function getAllStok(req: Request, res: Response) {
     try {
         console.log(req.query);
         const stokService = new StokService();
-        const result = await stokService.findAll(req.query as unknown as IPaginationQuery);
+        const result = await stokService.findAll(req.query as unknown as IParamsQuery);
         res.status(200).send({
             'status': 'success',
             'code': 200,
-            'data': result
-        })
+            'data': result.data,
+            'document': {...result.document}
+        });
+        // console.log({'data': result.data,
+        // 'document': {...result.document}});
     } catch (error) {
         console.log(error);
         return res.status(500).send({

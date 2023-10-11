@@ -1,4 +1,6 @@
-export interface IPaginationQuery {
+export interface IParamsQuery {
+    search: string | undefined
     page: number
-    perPage: number
+    perPage: number,
+    tokoId: string
 }

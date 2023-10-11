@@ -57,7 +57,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
         return res.status(400).send({
             "status": "Failed",
             "code": 400,
-            "error": 'Oops.. akun tidak ditemukan'
+            "error": 'Oops.. email atau password salah'
         })
     } catch (error) {
         res.status(500).send({

@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import StokDTO from "./dto/stok.dto";
-import {IPaginationQuery} from './interfaces/stok.interface';
+import {IParamsQuery} from './interfaces/stok.interface';
 const StokBarang = new PrismaClient().stokBarang;
 
 class StokService {
@@ -20,20 +20,86 @@ class StokService {
         return result;
     }
 
-    async findAll({page, perPage}: IPaginationQuery) {
+    async findAll({search, page, perPage, tokoId}: IParamsQuery) {
         const skipPage = Number(page) * 10 - 10;
-        const result = await StokBarang.findMany({
-            skip: skipPage,
-            take: Number(perPage),
-
-            include: {
-                toko: true
-            },
-            orderBy: {
-                createdAt: 'desc'
+        const totalCount = await StokBarang.count();
+        const totalPages = Math.ceil(totalCount / perPage);
+        let result;
+        if (tokoId === 'all') {
+            if (search !== 'undefined') {
+                result = await StokBarang.findMany({
+                    where: {
+                        nama: {
+                            contains: search,
+                            mode: 'insensitive'
+                        },
+                    },
+                    skip: skipPage,
+                    take: Number(perPage),
+                    include: {
+                        toko: true
+                    },
+                    orderBy: {
+                        createdAt: 'desc'
+                    }
+                });
+            } else {
+                result = await StokBarang.findMany({
+                    skip: skipPage,
+                    take: Number(perPage),
+                    include: {
+                        toko: true
+                    },
+                    orderBy: {
+                        createdAt: 'desc'
+                    }
+                });
             }
-        })
-        return result;
+        } else {
+            if (search !== 'undefined') {
+                result = await StokBarang.findMany({
+                    where: {
+                        nama: {
+                            contains: search,
+                            mode: 'insensitive'
+                        },
+                        tokoId
+                    },
+                    skip: skipPage,
+                    take: Number(perPage),
+                    include: {
+                        toko: true
+                    },
+                    orderBy: {
+                        createdAt: 'desc'
+                    }
+                });
+            } else {
+                result = await StokBarang.findMany({
+                    where: {
+                        tokoId
+                    },
+                    skip: skipPage,
+                    take: Number(perPage),
+                    include: {
+                        toko: true
+                    },
+                    orderBy: {
+                        createdAt: 'desc'
+                    }
+                });
+            }
+        }
+
+        return {
+            data: result,
+            document: {
+                currentPage: Number(page),
+                pageSize: Number(perPage),
+                totalCount,
+                totalPages,
+            }
+        };
     }
 
     async findOneById(id: string) {
