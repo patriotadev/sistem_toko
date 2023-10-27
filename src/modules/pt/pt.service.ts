@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import PtDTO from './dto/pt.dto';
+import { IParamsQuery } from './interfaces/pt.interface';
 const Pt = new PrismaClient().pt;
 
 class PtService {
@@ -16,9 +17,44 @@ class PtService {
         return result;
     }
 
-    async findAll() {
-        const result = await Pt.findMany();
-        return result;
+    async findAll({search, page, perPage}: IParamsQuery) {
+        const skipPage = Number(page) * 10 - 10;
+        const totalCount = await Pt.count();
+        const totalPages = Math.ceil(totalCount / perPage);
+        let result;
+        if (search !== 'undefined') {
+            result = await Pt.findMany({
+                where: {
+                    nama: {
+                        contains: search,
+                        mode: 'insensitive'
+                    },
+                },
+                skip: skipPage,
+                take: Number(perPage),
+                orderBy: {
+                    createdAt: 'desc'
+                }
+            });
+        } else {
+            result = await Pt.findMany({
+                skip: skipPage,
+                take: Number(perPage),
+                orderBy: {
+                    createdAt: 'desc'
+                }
+            });
+        }
+
+        return {
+            data: result,
+            document: {
+                currentPage: Number(page),
+                pageSize: Number(perPage),
+                totalCount,
+                totalPages,
+            }
+        };
     }
 
     async findOneById(id: string) {

@@ -4,3 +4,6 @@ prisma/migrations
 .env
 tsconfig.json
 dist
+
+Dockerfile
+docker-compose.yaml

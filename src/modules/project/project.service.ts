@@ -1,5 +1,6 @@
 import { PrismaClient, Project } from "@prisma/client";
 import ProjectDTO from "./dto/project.dto";
+import { IParamsQuery } from "./interfaces/project.interface";
 const Project = new PrismaClient().project;
 
 
@@ -16,13 +17,86 @@ class ProjectService {
         return result;
     }
 
-    async findAll() {
-        const result = await Project.findMany({
-            include: {
-                Pt: true
+    async findAll({ search, page, perPage, ptId }: IParamsQuery) {
+        const skipPage = Number(page) * 10 - 10;
+        const totalCount = await Project.count();
+        const totalPages = Math.ceil(totalCount / perPage);
+        let result;
+        if (ptId === 'all') {
+            if (search !== 'undefined') {
+                result = await Project.findMany({
+                    where: {
+                        nama: {
+                            contains: search,
+                            mode: 'insensitive'
+                        },
+                    },
+                    skip: skipPage,
+                    take: Number(perPage),
+                    include: {
+                        Pt: true
+                    },
+                    orderBy: {
+                        createdAt: 'desc'
+                    }
+                });
+            } else {
+                result = await Project.findMany({
+                    skip: skipPage,
+                    take: Number(perPage),
+                    include: {
+                        Pt: true
+                    },
+                    orderBy: {
+                        createdAt: 'desc'
+                    }
+                });
             }
-        });
-        return result
+        } else {
+            if (search !== 'undefined') {
+                result = await Project.findMany({
+                    where: {
+                        nama: {
+                            contains: search,
+                            mode: 'insensitive'
+                        },
+                        ptId
+                    },
+                    skip: skipPage,
+                    take: Number(perPage),
+                    include: {
+                        Pt: true
+                    },
+                    orderBy: {
+                        createdAt: 'desc'
+                    }
+                });
+            } else {
+                result = await Project.findMany({
+                    where: {
+                        ptId
+                    },
+                    skip: skipPage,
+                    take: Number(perPage),
+                    include: {
+                        Pt: true
+                    },
+                    orderBy: {
+                        createdAt: 'desc'
+                    }
+                });
+            }
+        }
+
+        return {
+            data: result,
+            document: {
+                currentPage: Number(page),
+                pageSize: Number(perPage),
+                totalCount,
+                totalPages,
+            }
+        };
     }
 
     async findOneById(id: string) {

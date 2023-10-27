@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import PoService from './po.service';
+import { IParamsQuery } from './interfaces/po.interface';
 
 export async function createPo(req: Request, res: Response) {
     try {
@@ -11,6 +12,7 @@ export async function createPo(req: Request, res: Response) {
             'message': 'Data has been added successfully.'
         });
     } catch (error) {
+        console.log(error);
         return res.status(500).send({
             'status': 'error',
             'code': 500,
@@ -22,11 +24,12 @@ export async function createPo(req: Request, res: Response) {
 export async function getAllPo(req: Request, res: Response) {
     try {
         const poService = new PoService();
-        const result = await poService.findAll();
+        const result = await poService.findAll(req.query as unknown as IParamsQuery);
         return res.status(200).send({
             'status': 'success',
             'code': 200,
-            'data': result
+            'data': result.data,
+            'document': {...result.document}
         });
     } catch (error) {
         return res.status(500).send({

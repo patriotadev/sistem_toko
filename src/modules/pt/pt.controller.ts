@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import PtService from './pt.service';
+import { IParamsQuery } from './interfaces/pt.interface';
 
 export async function createPt(req: Request, res: Response) {
     try {
@@ -22,11 +23,13 @@ export async function createPt(req: Request, res: Response) {
 export async function getAllPt(req: Request, res: Response) {
     try {
         const ptService = new PtService();
-        const result = await ptService.findAll();
+        const result = await ptService.findAll(req.query as unknown as IParamsQuery);
+        console.log(result);
         return res.status(200).send({
             'status': 'success',
             'code': 200,
-            'data': result
+            'data': result.data,
+            'document': {...result.document}
         });
     } catch (error) {
         return res.status(500).send({

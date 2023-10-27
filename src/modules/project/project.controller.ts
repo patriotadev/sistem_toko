@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import ProjectService from './project.service';
+import { IParamsQuery } from './interfaces/project.interface';
 
 export async function createProject(req: Request, res: Response) {
     try {
@@ -22,11 +23,12 @@ export async function createProject(req: Request, res: Response) {
 export async function getAllProject(req: Request, res: Response) {
     try {
         const projectService = new ProjectService();
-        const result = await projectService.findAll();
+        const result = await projectService.findAll(req.query as unknown as IParamsQuery);
         return res.status(200).send({
             'status': 'success',
             'code': 200,
-            'data': result
+            'data': result.data,
+            'document': {...result.document}
         });
     } catch (error) {
         return res.status(500).send({
@@ -80,7 +82,7 @@ export async function deleteProjectById(req: Request, res: Response) {
         return res.status(200).send({
             'status': 'success',
             'code': 200,
-            'data': 'Data has been deleted successfully.'
+            'message': 'Data has been deleted successfully.'
         });
     } catch (error) {
         return res.status(500).send({

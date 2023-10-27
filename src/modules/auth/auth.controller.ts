@@ -60,6 +60,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
             "error": 'Oops.. email atau password salah'
         })
     } catch (error) {
+        console.log(error);
         res.status(500).send({
             "Status": "Failed",
             "code": 500,
