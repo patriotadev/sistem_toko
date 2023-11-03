@@ -77,7 +77,11 @@ export async function getPoById(req: Request, res: Response) {
 export async function updatePoById(req: Request, res: Response) {
     try {
         const poService = new PoService();
-        await poService.updateOneById(req.body.id, req.body);
+        const barangPoService = new BarangPoService();
+        await poService.updateOneById(req.body.po.id, req.body.po);
+        for (let index = 0; index < req.body.barangPo.length; index++) {
+            await barangPoService.updateOneById(req.body.barangPo[index].id, req.body.barangPo[index]);
+        }
         return res.status(200).send({
             'status': 'success',
             'code': 200,
@@ -95,10 +99,11 @@ export async function updatePoById(req: Request, res: Response) {
 
 export async function deletePoById(req: Request, res: Response) {
     try {
+        console.log(req.body);
         const poService = new PoService();
         const barangPoService = new BarangPoService();
+        await barangPoService.deleteManyByPoId(req.body.id);
         await poService.deleteOneById(req.body.id);
-        await barangPoService.deleteManyByPoId(req.body.poId);
 
         return res.status(200).send({
             'status': 'success',
@@ -106,6 +111,7 @@ export async function deletePoById(req: Request, res: Response) {
             'message': 'Data has been deleted successfully.'
         });
     } catch (error) {
+        console.log(error);
         return res.status(500).send({
             'status': 'error',
             'code': 500,

@@ -45,11 +45,11 @@ class BarangPoService {
             },
             data: {
                 nama,
-                qty,
+                qty: Number(qty),
                 satuan,
-                discount,
-                harga,
-                jumlahHarga,
+                discount: Number(discount),
+                harga: Number(harga),
+                jumlahHarga: Number(jumlahHarga),
                 updatedBy,
                 poId
             }

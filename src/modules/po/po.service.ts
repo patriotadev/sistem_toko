@@ -36,7 +36,8 @@ class PoService {
                     take: Number(perPage),
                     include: {
                         Pt: true,
-                        Project: true
+                        Project: true,
+                        BarangPo: true
                     },
                     orderBy: {
                         createdAt: 'desc'
@@ -48,7 +49,8 @@ class PoService {
                     take: Number(perPage),
                     include: {
                         Pt: true,
-                        Project: true
+                        Project: true,
+                        BarangPo: true
                     },
                     orderBy: {
                         createdAt: 'desc'
@@ -71,7 +73,8 @@ class PoService {
                         take: Number(perPage),
                         include: {
                             Pt: true,
-                            Project: true
+                            Project: true,
+                            BarangPo: true
                         },
                         orderBy: {
                             createdAt: 'desc'
@@ -86,7 +89,8 @@ class PoService {
                         take: Number(perPage),
                         include: {
                             Pt: true,
-                            Project: true
+                            Project: true,
+                            BarangPo: true
                         },
                         orderBy: {
                             createdAt: 'desc'
@@ -108,7 +112,8 @@ class PoService {
                         take: Number(perPage),
                         include: {
                             Pt: true,
-                            Project: true
+                            Project: true,
+                            BarangPo: true
                         },
                         orderBy: {
                             createdAt: 'desc'
@@ -124,7 +129,8 @@ class PoService {
                         take: Number(perPage),
                         include: {
                             Pt: true,
-                            Project: true
+                            Project: true,
+                            BarangPo: true
                         },
                         orderBy: {
                             createdAt: 'desc'
