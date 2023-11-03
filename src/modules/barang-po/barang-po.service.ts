@@ -3,28 +3,9 @@ import BarangPoDTO from "./dto/barang-po.dto";
 const BarangPo = new PrismaClient().barangPo;
 
 class BarangPoService {
-    async create(payload: BarangPoDTO) {
-        const { 
-            nama,
-            qty,
-            satuan,
-            discount,
-            harga,
-            jumlahHarga,
-            createdBy,
-            poId
-        } = payload;
-        const result = await BarangPo.create({
-            data: {
-                nama,
-                qty,
-                satuan,
-                discount: discount || 0,
-                harga,
-                jumlahHarga,
-                createdBy,
-                poId
-            }
+    async create(payload: any) {
+        const result = await BarangPo.createMany({
+            data: [...payload]
         });
         return result;
     }
@@ -80,6 +61,15 @@ class BarangPoService {
         const result = await BarangPo.delete({
             where: {
                 id
+            }
+        });
+        return result;
+    }
+
+    async deleteManyByPoId(poId: string) {
+        const result = await BarangPo.deleteMany({
+            where: {
+                poId
             }
         });
         return result;
