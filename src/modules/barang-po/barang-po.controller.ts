@@ -22,7 +22,7 @@ export async function createBarangPo(req: Request, res: Response) {
 export async function getAllBarangPo(req: Request, res: Response) {
     try {
         const barangPoService = new BarangPoService();
-        const result = await barangPoService.findAll();
+        const result = await barangPoService.findAll(req.query.poId as string);
         return res.status(200).send({
             'status': 'success',
             'code': 200,

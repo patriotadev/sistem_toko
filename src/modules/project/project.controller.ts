@@ -64,7 +64,7 @@ export async function updateProjectById(req: Request, res: Response) {
         return res.status(200).send({
             'status': 'success',
             'code': 200,
-            'data': 'Data has been updated successfully.'
+            'message': 'Data has been updated successfully.'
         });
     } catch (error) {
         return res.status(500).send({

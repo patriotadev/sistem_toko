@@ -4,12 +4,13 @@ const SuratJalanPo = new PrismaClient().suratJalanPo;
 
 class SuratJalanPoService {
     async create (payload: SuratJalanPoDTO) {
-        const { nomor, namaSupir, createdBy, poId } = payload;
+        const { nomor, namaSupir, createdBy, tanggal, poId } = payload;
         const result = await SuratJalanPo.create({
             data : {
                 nomor,
                 namaSupir,
                 createdBy,
+                tanggal,
                 poId
             }
         });
@@ -35,7 +36,7 @@ class SuratJalanPoService {
     }
 
     async updateOneById(id: string, payload: SuratJalanPoDTO) {
-        const { nomor, namaSupir, updatedBy, poId } = payload;
+        const { nomor, namaSupir, updatedBy, tanggal, poId } = payload;
         const result = await SuratJalanPo.update({
             where: {
                 id
@@ -44,6 +45,7 @@ class SuratJalanPoService {
                 nomor,
                 namaSupir,
                 updatedBy,
+                tanggal,
                 poId
             }
         });

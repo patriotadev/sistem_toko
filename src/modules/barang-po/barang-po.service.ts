@@ -10,10 +10,10 @@ class BarangPoService {
         return result;
     }
 
-    async findAll() {
+    async findAll(poId: string) {
         const result = await BarangPo.findMany({
-            include: {
-                po: true
+            where: {
+                poId
             }
         });
         return result;
