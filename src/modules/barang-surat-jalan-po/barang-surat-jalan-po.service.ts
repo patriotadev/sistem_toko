@@ -3,16 +3,9 @@ import BarangSuratJalanPoDTO from "./dto/barang-surat-jalan-po.dto";
 const BarangSuratJalanPo = new PrismaClient().barangSuratJalanPo;
 
 class BarangSuratJalanPoService {
-    async create(payload: BarangSuratJalanPoDTO) {
-        const { nama, qty, satuan, createdBy, suratJalanPoId } = payload;
-        const result = await BarangSuratJalanPo.create({
-            data: {
-                nama,
-                qty,
-                satuan,
-                createdBy,
-                suratJalanPoId
-            }
+    async create(payload: Omit<BarangSuratJalanPoDTO, "id">[]) {
+        const result = await BarangSuratJalanPo.createMany({
+            data: [...(payload as unknown as BarangSuratJalanPoDTO[])]
         });
         return result;
     }
@@ -56,6 +49,15 @@ class BarangSuratJalanPoService {
         const result = await BarangSuratJalanPo.delete({
             where: {
                 id
+            }
+        });
+        return result;
+    }
+
+    async deleteManyBySuratJalanPoId(suratJalanPoId: string) {
+        const result = await BarangSuratJalanPo.deleteMany({
+            where: {
+                suratJalanPoId
             }
         });
         return result;

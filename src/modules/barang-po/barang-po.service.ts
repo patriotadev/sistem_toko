@@ -3,9 +3,9 @@ import BarangPoDTO from "./dto/barang-po.dto";
 const BarangPo = new PrismaClient().barangPo;
 
 class BarangPoService {
-    async create(payload: any) {
+    async create(payload: BarangPoDTO[]) {
         const result = await BarangPo.createMany({
-            data: [...payload]
+            data: [...(payload as unknown as [])]
         });
         return result;
     }

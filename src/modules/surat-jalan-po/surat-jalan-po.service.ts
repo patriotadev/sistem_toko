@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import SuratJalanPoDTO from "./dto/surat-jalan-po.dto";
+import { IParamsQuery } from "./interfaces/surat-jalan-po.interface";
 const SuratJalanPo = new PrismaClient().suratJalanPo;
 
 class SuratJalanPoService {
@@ -17,13 +18,64 @@ class SuratJalanPoService {
         return result;
     }
 
-    async findAll() {
-        const result = await SuratJalanPo.findMany({
-            include: {
-                Po: true
+    async findAll({search, page, perPage}: IParamsQuery) {
+        const skipPage = Number(page) * 10 - 10;
+        const totalCount = await SuratJalanPo.count();
+        const totalPages = Math.ceil(totalCount / perPage);
+        let result;
+        if (search !== 'undefined') {
+            result = await SuratJalanPo.findMany({
+                where: {
+                    OR: [
+                        {
+                            nomor:{
+                                contains: search,
+                                mode: 'insensitive'
+                            },
+                        },
+                        {
+                            Po: {
+                                noPo: {
+                                    contains: search,
+                                    mode: 'insensitive'
+                                },
+                            }
+                        }
+                    ]
+                },
+                skip: skipPage,
+                take: Number(perPage),
+                include: {
+                    Po: true,
+                    BarangSuratJalanPo: true
+                },
+                orderBy: {
+                    createdAt: 'desc'
+                }
+            });
+        } else {
+            result = await SuratJalanPo.findMany({
+                skip: skipPage,
+                take: Number(perPage),
+                include: {
+                    Po: true,
+                    BarangSuratJalanPo: true
+                },
+                orderBy: {
+                    createdAt: 'desc'
+                }
+            });
+        }
+      
+        return {
+            data: result,
+            document: {
+                currentPage: Number(page),
+                pageSize: Number(perPage),
+                totalCount,
+                totalPages,
             }
-        });
-        return result;
+        };
     }
 
     async findOneById(id: string) {

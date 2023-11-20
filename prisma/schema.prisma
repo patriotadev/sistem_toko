@@ -69,6 +69,7 @@ model SubMenu {
 
 model StokBarang {
   id         String    @id @default(cuid())
+  kode       String?
   nama       String
   jumlah     Int
   satuan     String
@@ -108,32 +109,35 @@ model Project {
 }
 
 model Po {
-  id           String         @id @default(cuid())
-  noPo         String         @unique
-  tanggal      DateTime
-  createdBy    String
-  createdAt    DateTime       @default(now())
-  updatedBy    String?
-  updatedAt    DateTime?      @default(now())
-  Pt           Pt             @relation(fields: [ptId], references: [id])
-  ptId         String
-  Project      Project        @relation(fields: [projectId], references: [id])
-  projectId    String
-  SuratJalanPo SuratJalanPo[]
-  InvoicePo    InvoicePo[]
-  BarangPo     BarangPo[]
+  id                String         @id @default(cuid())
+  noPo              String         @unique
+  tanggal           DateTime
+  tanggalJatuhTempo DateTime
+  createdBy         String
+  createdAt         DateTime       @default(now())
+  updatedBy         String?
+  updatedAt         DateTime?      @default(now())
+  Pt                Pt             @relation(fields: [ptId], references: [id])
+  ptId              String
+  Project           Project        @relation(fields: [projectId], references: [id])
+  projectId         String
+  isCompleted       Boolean
+  SuratJalanPo      SuratJalanPo[]
+  InvoicePo         InvoicePo[]
+  BarangPo          BarangPo[]
 }
 
 model SuratJalanPo {
   id                 String               @id @default(cuid())
-  nomor              String
+  nomor              String               @unique
   namaSupir          String
   tanggal            DateTime
+  tanggalJatuhTempo  DateTime
   createdBy          String
   createdAt          DateTime             @default(now())
   updatedBy          String?
   updatedAt          DateTime?            @default(now())
-  Po                 Po                   @relation(fields: [poId], references: [id])
+  Po                 Po                   @relation(fields: [poId], references: [id], onDelete: Cascade)
   poId               String
   BarangSuratJalanPo BarangSuratJalanPo[]
 }
@@ -164,6 +168,7 @@ model InvoicePo {
 
 model BarangPo {
   id          String    @id @default(cuid())
+  kode        String?
   nama        String
   qty         Int
   satuan      String
@@ -180,9 +185,10 @@ model BarangPo {
 
 model BarangSuratJalanPo {
   id             String       @id @default(cuid())
+  kode           String?
   nama           String
   qty            Int
-  satuan         Int
+  satuan         String
   createdBy      String
   createdAt      DateTime     @default(now())
   updatedBy      String?

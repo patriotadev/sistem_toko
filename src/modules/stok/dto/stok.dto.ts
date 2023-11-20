@@ -1,4 +1,5 @@
 export default interface StokDTO {
+    id: string
     nama : string
     jumlah : number
     satuan: string

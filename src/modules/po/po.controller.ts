@@ -2,14 +2,15 @@ import { Request, Response, NextFunction } from 'express';
 import PoService from './po.service';
 import { IParamsQuery } from './interfaces/po.interface';
 import BarangPoService from '../barang-po/barang-po.service';
+import BarangPoDTO from '../barang-po/dto/barang-po.dto';
 
 export async function createPo(req: Request, res: Response) {
     try {
         const poService = new PoService();
         const barangPoService = new BarangPoService();
         const poResult = await poService.create(req.body.po);
-        const barangPoPayload: any = [];
-        req.body.barangPo.map((item: any) => {
+        const barangPoPayload: BarangPoDTO[] = [];
+        req.body.barangPo.map((item: BarangPoDTO) => {
             barangPoPayload.push({
                 nama: item.nama,
                 qty: item.qty,
