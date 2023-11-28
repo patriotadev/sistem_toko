@@ -10,18 +10,23 @@ export async function createPo(req: Request, res: Response) {
         const barangPoService = new BarangPoService();
         const poResult = await poService.create(req.body.po);
         const barangPoPayload: BarangPoDTO[] = [];
+        const lastStep = await barangPoService.findLastStep(poResult.id);
+        console.log(lastStep, "==> last stepp");
         req.body.barangPo.map((item: BarangPoDTO) => {
             barangPoPayload.push({
+                kode: item.kode,
                 nama: item.nama,
                 qty: item.qty,
                 satuan: item.satuan,
                 harga: item.harga,
                 jumlahHarga: item.jumlahHarga,
                 discount: item.discount,
+                step: Number(lastStep) ? Number(lastStep) + 1 : 1,
                 poId: poResult.id,
+                stokBarangId: item.stokBarangId,
                 createdBy: item.createdBy
             })
-        })
+        });
         await barangPoService.create(barangPoPayload)
         return res.status(201).send({
             'status': 'success',

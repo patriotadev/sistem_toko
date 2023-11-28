@@ -19,6 +19,22 @@ class BarangPoService {
         return result;
     }
 
+    async findLastStep(poId: string) {
+        const result = await BarangPo.findFirst({
+            where: {
+                poId
+            },
+            select: {
+                step: true
+            },
+            orderBy: {
+                step: 'desc'
+            }
+        });
+        console.log("servicee=>", result);
+        return result?.step;
+    }
+
     async findOneById(id: string) {
         const result = await BarangPo.findUnique({
             where: {

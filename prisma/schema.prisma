@@ -68,19 +68,21 @@ model SubMenu {
 }
 
 model StokBarang {
-  id         String    @id @default(cuid())
-  kode       String?
-  nama       String
-  jumlah     Int
-  satuan     String
-  hargaModal Int
-  hargaJual  Int
-  createdBy  String
-  createdAt  DateTime  @default(now())
-  updatedBy  String?
-  updatedAt  DateTime? @default(now())
-  toko       Toko      @relation(fields: [tokoId], references: [id])
-  tokoId     String
+  id                 String               @id @default(cuid())
+  kode               String
+  nama               String
+  jumlah             Int
+  satuan             String
+  hargaModal         Int
+  hargaJual          Int
+  createdBy          String
+  createdAt          DateTime             @default(now())
+  updatedBy          String?
+  updatedAt          DateTime?            @default(now())
+  toko               Toko                 @relation(fields: [tokoId], references: [id])
+  tokoId             String
+  BarangPo           BarangPo[]
+  BarangSuratJalanPo BarangSuratJalanPo[]
 }
 
 model Pt {
@@ -121,7 +123,7 @@ model Po {
   ptId              String
   Project           Project        @relation(fields: [projectId], references: [id])
   projectId         String
-  isCompleted       Boolean
+  status            String
   SuratJalanPo      SuratJalanPo[]
   InvoicePo         InvoicePo[]
   BarangPo          BarangPo[]
@@ -132,7 +134,6 @@ model SuratJalanPo {
   nomor              String               @unique
   namaSupir          String
   tanggal            DateTime
-  tanggalJatuhTempo  DateTime
   createdBy          String
   createdAt          DateTime             @default(now())
   updatedBy          String?
@@ -167,25 +168,28 @@ model InvoicePo {
 }
 
 model BarangPo {
-  id          String    @id @default(cuid())
-  kode        String?
-  nama        String
-  qty         Int
-  satuan      String
-  discount    Int
-  harga       Int
-  jumlahHarga Int
-  createdBy   String
-  createdAt   DateTime  @default(now())
-  updatedBy   String?
-  updatedAt   DateTime? @default(now())
-  po          Po        @relation(fields: [poId], references: [id])
-  poId        String
+  id           String     @id @default(cuid())
+  kode         String
+  nama         String
+  qty          Int
+  satuan       String
+  discount     Int
+  harga        Int
+  jumlahHarga  Int
+  step         Int
+  createdBy    String
+  createdAt    DateTime   @default(now())
+  updatedBy    String?
+  updatedAt    DateTime?  @default(now())
+  po           Po         @relation(fields: [poId], references: [id])
+  poId         String
+  StokBarang   StokBarang @relation(fields: [stokBarangId], references: [id])
+  stokBarangId String
 }
 
 model BarangSuratJalanPo {
   id             String       @id @default(cuid())
-  kode           String?
+  kode           String
   nama           String
   qty            Int
   satuan         String
@@ -195,6 +199,8 @@ model BarangSuratJalanPo {
   updatedAt      DateTime?    @default(now())
   suratJalanPo   SuratJalanPo @relation(fields: [suratJalanPoId], references: [id])
   suratJalanPoId String
+  StokBarang     StokBarang   @relation(fields: [stokBarangId], references: [id])
+  stokBarangId   String
 }
 
 model Penjualan {

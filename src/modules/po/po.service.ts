@@ -5,14 +5,23 @@ const Po = new PrismaClient().po;
 
 class PoService {
     async create(payload: PoDTO) {
-        const { noPo, tanggal, createdBy, ptId, projectId } = payload;
+        const { 
+            noPo,
+            tanggal,
+            tanggalJatuhTempo,
+            createdBy,
+            ptId,
+            projectId
+        } = payload;
         const result = await Po.create({
             data : {
                 noPo,
                 tanggal: new Date(tanggal),
+                tanggalJatuhTempo: new Date(tanggalJatuhTempo),
                 createdBy,
                 ptId,
-                projectId
+                projectId,
+                status: 'Sedang Proses'
             }
         });
         return result;
@@ -160,7 +169,14 @@ class PoService {
     }
 
     async updateOneById(id: string, payload: PoDTO) {
-        const { noPo, tanggal, updatedBy, ptId, projectId } = payload;
+        const { 
+            noPo,
+            tanggal,
+            tanggalJatuhTempo,
+            updatedBy,
+            ptId,
+            projectId
+        } = payload;
         const result = await Po.update({
             where: {
                 id
@@ -168,6 +184,7 @@ class PoService {
             data : {
                 noPo,
                 tanggal,
+                tanggalJatuhTempo,
                 updatedBy,
                 ptId,
                 projectId
@@ -184,7 +201,6 @@ class PoService {
         });
         return result;
     }
-
 }
 
 export default PoService;

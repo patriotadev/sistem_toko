@@ -17,14 +17,16 @@ export async function createSuratJalanPo(req: Request, res: Response) {
         const stokBarangPayload: Pick<StokDTO, "id" | "jumlah">[] = [];
         req.body.barangPo.map((item: BarangSuratJalanPoDTO) => {
             barangSuratJalanPoPayload.push({
+                kode: item.kode,
                 nama: item.nama,
                 qty: item.qty,
                 satuan: item.satuan,
                 suratJalanPoId: suratJalanPoResult.id,
-                createdBy: item.createdBy
+                createdBy: item.createdBy,
+                stokBarangId: item.stokBarangId
             });
             stokBarangPayload.push({
-                id: item.id,
+                id: item.stokBarangId,
                 jumlah: item.qty
             })
         });
@@ -36,6 +38,7 @@ export async function createSuratJalanPo(req: Request, res: Response) {
             'message': 'Data has been added successfully.'
         });
     } catch (error) {
+        console.log(error);
         return res.status(500).send({
             'status': 'error',
             'code': 500,

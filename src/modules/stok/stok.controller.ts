@@ -47,7 +47,9 @@ export async function getAllStok(req: Request, res: Response) {
 export async function getStokById(req: Request, res: Response) {
     try {
         const stokService = new StokService();
+        console.log(req.params.id, "==> id");
         const result = await stokService.findOneById(req.params.id);
+        console.log(result, "==> resulttt");
         res.status(200).send({
             'status': 'success',
             'code': 200,

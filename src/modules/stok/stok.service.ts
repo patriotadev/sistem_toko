@@ -5,9 +5,10 @@ const StokBarang = new PrismaClient().stokBarang;
 
 class StokService {
     async create(payload: StokDTO) {
-        const {nama, jumlah, satuan, hargaModal, hargaJual, createdBy, tokoId} = payload
+        const {kode, nama, jumlah, satuan, hargaModal, hargaJual, createdBy, tokoId} = payload
         const result = await StokBarang.create({
             data: {
+                kode,
                 nama,
                 jumlah,
                 satuan,
@@ -29,10 +30,21 @@ class StokService {
             if (search !== 'undefined') {
                 result = await StokBarang.findMany({
                     where: {
-                        nama: {
-                            contains: search,
-                            mode: 'insensitive'
-                        },
+                        OR: [
+                            {
+                                nama: {
+                                    contains: search,
+                                    mode: 'insensitive'
+                                },
+                            },
+                            {
+                                kode: {
+                                    contains: search,
+                                    mode: 'insensitive'
+                                },
+                            }
+
+                        ]
                     },
                     skip: skipPage,
                     take: Number(perPage),
@@ -59,11 +71,21 @@ class StokService {
             if (search !== 'undefined') {
                 result = await StokBarang.findMany({
                     where: {
-                        nama: {
-                            contains: search,
-                            mode: 'insensitive'
-                        },
-                        tokoId
+                        OR: [
+                            {
+                                nama: {
+                                    contains: search,
+                                    mode: 'insensitive'
+                                },
+                            },
+                            {
+                                kode: {
+                                    contains: search,
+                                    mode: 'insensitive'
+                                },
+                            }
+
+                        ]
                     },
                     skip: skipPage,
                     take: Number(perPage),
@@ -103,6 +125,7 @@ class StokService {
     }
 
     async findOneById(id: string) {
+        console.log(id, "==> id on service")
         const result = await StokBarang.findUnique({
             where : {
                 id
@@ -110,17 +133,19 @@ class StokService {
             include: {
                 toko: true
             }
-        })
+        });
+        console.log(result, "==> result on service")
         return result;
     }
 
     async updateOneById(id: string, payload: StokDTO) {
-        const { nama, jumlah, satuan, hargaModal, hargaJual, updatedBy, tokoId } = payload
+        const { kode, nama, jumlah, satuan, hargaModal, hargaJual, updatedBy, tokoId } = payload
         const result = await StokBarang.update({
             where: {
                 id
             },
             data: {
+                kode,
                 nama,
                 jumlah,
                 satuan,
@@ -139,15 +164,17 @@ class StokService {
                     id: item.id
                 }
             });
-            await StokBarang.update({
-                where: {
-                    id: stokData?.id
-                },
-                data: {
-                    ...stokData,
-                    jumlah: item.jumlah
-                }
-            })
+            if (stokData) {
+                await StokBarang.update({
+                    where: {
+                        id: stokData?.id
+                    },
+                    data: {
+                        ...stokData,
+                        jumlah: stokData?.jumlah - item.jumlah
+                    }
+                });
+            }
         })
     }
 
