@@ -181,6 +181,7 @@ model BarangPo {
   createdAt    DateTime   @default(now())
   updatedBy    String?
   updatedAt    DateTime?  @default(now())
+  isMaster     Boolean
   po           Po         @relation(fields: [poId], references: [id])
   poId         String
   StokBarang   StokBarang @relation(fields: [stokBarangId], references: [id])

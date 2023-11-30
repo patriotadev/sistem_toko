@@ -6,16 +6,21 @@ import BarangSuratJalanPoDTO from '../barang-surat-jalan-po/dto/barang-surat-jal
 import StokService from '../stok/stok.service';
 import StokDTO from '../stok/dto/stok.dto';
 import { IParamsQuery } from './interfaces/surat-jalan-po.interface';
+import BarangPoService from '../barang-po/barang-po.service';
+import { BarangPo } from '@prisma/client';
+import BarangPoDTO from '../barang-po/dto/barang-po.dto';
 
 export async function createSuratJalanPo(req: Request, res: Response) {
     try {
         const suratJalanPoService = new SuratJalanPoService();
         const barangSuratJalanPoService = new BarangSuratJalanPoService();
+        const barangPoService = new BarangPoService();
         const stokService = new StokService();
         const suratJalanPoResult = await suratJalanPoService.create(req.body.suratJalan);
         const barangSuratJalanPoPayload: Omit<BarangSuratJalanPoDTO, "id">[] = [];
         const stokBarangPayload: Pick<StokDTO, "id" | "jumlah">[] = [];
-        req.body.barangPo.map((item: BarangSuratJalanPoDTO) => {
+        console.log(req.body.barangPo, "<=== BARANG PO FROM FE");
+        Promise.all(req.body.barangPo.map(async(item: BarangSuratJalanPoDTO) => {
             barangSuratJalanPoPayload.push({
                 kode: item.kode,
                 nama: item.nama,
@@ -25,11 +30,27 @@ export async function createSuratJalanPo(req: Request, res: Response) {
                 createdBy: item.createdBy,
                 stokBarangId: item.stokBarangId
             });
+            const barangPoLastStep = await barangPoService.findLastStep(req.body.suratJalan.poId, item.stokBarangId)
+            await barangPoService.updateOneById(item.id, {
+                id: item.id,
+                kode: item.kode,
+                nama: item.nama,
+                qty: Number(barangPoLastStep?.qty) - Number(item.qty),
+                satuan: item.satuan,
+                discount: Number(barangPoLastStep?.discount),
+                harga: Number(barangPoLastStep?.harga),
+                poId: req.body.suratJalan.poId,
+                createdBy: item.createdBy,
+                isMaster: false,
+                jumlahHarga: (Number(barangPoLastStep?.qty) - Number(item.qty)) * Number(barangPoLastStep?.harga),
+                step: Number(barangPoLastStep?.step),
+                stokBarangId: item.stokBarangId
+            });
             stokBarangPayload.push({
                 id: item.stokBarangId,
                 jumlah: item.qty
             })
-        });
+        }));
         await barangSuratJalanPoService.create(barangSuratJalanPoPayload);
         await stokService.updateManyById(stokBarangPayload);
         return res.status(201).send({
