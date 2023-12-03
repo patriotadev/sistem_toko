@@ -5,5 +5,6 @@ export default interface PoDTO {
     createdBy: string
     updatedBy?: string
     ptId: string
+    status: string
     projectId: string
 }

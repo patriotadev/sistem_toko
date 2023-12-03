@@ -31,21 +31,23 @@ export async function createSuratJalanPo(req: Request, res: Response) {
                 stokBarangId: item.stokBarangId
             });
             const barangPoLastStep = await barangPoService.findLastStep(req.body.suratJalan.poId, item.stokBarangId)
-            await barangPoService.updateOneById(item.id, {
-                id: item.id,
-                kode: item.kode,
-                nama: item.nama,
-                qty: Number(barangPoLastStep?.qty) - Number(item.qty),
-                satuan: item.satuan,
-                discount: Number(barangPoLastStep?.discount),
-                harga: Number(barangPoLastStep?.harga),
-                poId: req.body.suratJalan.poId,
-                createdBy: item.createdBy,
-                isMaster: false,
-                jumlahHarga: (Number(barangPoLastStep?.qty) - Number(item.qty)) * Number(barangPoLastStep?.harga),
-                step: Number(barangPoLastStep?.step),
-                stokBarangId: item.stokBarangId
-            });
+            if (barangPoLastStep) {
+                await barangPoService.updateOneById(barangPoLastStep.id, {
+                    id: item.id,
+                    kode: item.kode,
+                    nama: item.nama,
+                    qty: Number(barangPoLastStep?.qty) - Number(item.qty),
+                    satuan: item.satuan,
+                    discount: Number(barangPoLastStep?.discount),
+                    harga: Number(barangPoLastStep?.harga),
+                    poId: req.body.suratJalan.poId,
+                    createdBy: item.createdBy,
+                    isMaster: false,
+                    jumlahHarga: (Number(barangPoLastStep?.qty) - Number(item.qty)) * Number(barangPoLastStep?.harga),
+                    step: Number(barangPoLastStep?.step),
+                    stokBarangId: item.stokBarangId
+                });
+            }
             stokBarangPayload.push({
                 id: item.stokBarangId,
                 jumlah: item.qty

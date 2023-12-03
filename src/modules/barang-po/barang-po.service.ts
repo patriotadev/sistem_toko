@@ -1,11 +1,21 @@
 import { PrismaClient } from "@prisma/client";
 import BarangPoDTO from "./dto/barang-po.dto";
 const BarangPo = new PrismaClient().barangPo;
+const Prisma = new PrismaClient();
 
 class BarangPoService {
     async create(payload: Omit<BarangPoDTO, "id">[]) {
         const result = await BarangPo.createMany({
             data: [...(payload as unknown as [])]
+        });
+        return result;
+    }
+
+    async createOne(payload: Omit<BarangPoDTO, "id">) {
+        const result = await BarangPo.create({
+            data: {
+                ...payload as any
+            }
         });
         return result;
     }
@@ -38,6 +48,38 @@ class BarangPoService {
             }
         });
         return result;
+    }
+
+    async findPreviousDifferenceQty(firstStep: number, lastStep: number, stokBarangId: string) {
+        const firstStepQty = await BarangPo.findFirst({
+            where: {
+                step: firstStep,
+                stokBarangId
+            }
+        });
+        const lastStepQty = await BarangPo.findFirst({
+            where: {
+                step: lastStep,
+                stokBarangId
+            }
+        });
+        if (firstStepQty && lastStepQty) {
+            return firstStepQty?.qty - lastStepQty?.qty;
+        }
+        return null;
+        // const result = await BarangPo.aggregate({
+        //     where: {
+        //         stokBarangId,
+        //         step: {
+        //             lt: currentStep
+        //         }
+        //     },
+        //     _sum: {
+        //         qty: true
+        //     }
+
+        // })
+        // return result._sum.qty;
     }
 
     async findOneById(id: string) {

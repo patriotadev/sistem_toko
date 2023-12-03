@@ -3,6 +3,7 @@ import PoService from './po.service';
 import { IParamsQuery } from './interfaces/po.interface';
 import BarangPoService from '../barang-po/barang-po.service';
 import BarangPoDTO from '../barang-po/dto/barang-po.dto';
+import { Prisma } from '@prisma/client';
 
 export async function createPo(req: Request, res: Response) {
     try {
@@ -137,6 +138,25 @@ export async function getPoById(req: Request, res: Response) {
     }
 }
 
+export async function updateStatusPoById(req: Request, res: Response) {
+    try {
+        const poService = new PoService();
+        await poService.updateStatusById(req.body.po.id, req.body.po);
+        return res.status(200).send({
+            'status': 'success',
+            'code': 201,
+            'message': 'Data has been updated successfully.'
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({
+            'status': 'error',
+            'code': 500,
+            'message': 'Internal server error.'
+        });
+    }
+}
+
 export async function updatePoById(req: Request, res: Response) {
     try {
         const poService = new PoService();
@@ -145,26 +165,47 @@ export async function updatePoById(req: Request, res: Response) {
         // for (let index = 0; index < req.body.barangPo.length; index++) {
         //     await barangPoService.updateOneById(req.body.barangPo[index].id, req.body.barangPo[index]);
         // }
-        const barangPoPayload: Omit<BarangPoDTO, "id">[] = [];
+        const barangPoMasterPayload: Omit<BarangPoDTO, "id">[] = [];
+        const barangPoNextPayload: Omit<BarangPoDTO, "id">[] = [];
         console.log(req.body.barangPo, "<===BarangPo");
         req.body.barangPo.map((item: Omit<BarangPoDTO, "id">) => {
-            barangPoPayload.push({
+            barangPoMasterPayload.push({
                 kode: item.kode,
                 nama: item.nama,
                 qty: Number(item.qty),
                 satuan: item.satuan,
                 harga: Number(item.harga),
-                jumlahHarga: Number(item.jumlahHarga),
+                jumlahHarga: Number(item.harga) * Number(item.qty),
                 discount: Number(item.discount),
-                step: item.step + 1,
+                step: Number(item.step) + 2,
                 isMaster: true,
                 poId: req.body.po.id,
                 stokBarangId: item.stokBarangId,
                 createdBy: item.createdBy
             })
         });
-        const updatee = await barangPoService.create(barangPoPayload)
-        console.log(updatee, "<==Update Barang Po");
+        const createNewMaster = await barangPoService.create(barangPoMasterPayload);
+        barangPoMasterPayload.forEach(async (item) => {
+            const previousBarangPoQty = await barangPoService.findPreviousDifferenceQty(Number(item.step) - 2, Number(item.step) - 1, item.stokBarangId);
+            console.log(previousBarangPoQty, "<==previous Barang Po");
+            const newQty = item.qty - Number(previousBarangPoQty);
+            await barangPoService.createOne({
+                kode: item.kode,
+                nama: item.nama,
+                qty:  Number(newQty),
+                satuan: item.satuan,
+                harga: Number(item.harga),
+                jumlahHarga: Number(item.harga) * Number(newQty),
+                discount: Number(item.discount),
+                step: Number(item.step) + 1,
+                isMaster: false,
+                poId: req.body.po.id,
+                stokBarangId: item.stokBarangId,
+                createdBy: item.createdBy
+            })
+        })
+        console.log(createNewMaster, "<==Update Barang Po");
+        console.log(barangPoMasterPayload[0].step + 2, "<===BarangPoStepInput")
         return res.status(200).send({
             'status': 'success',
             'code': 200,

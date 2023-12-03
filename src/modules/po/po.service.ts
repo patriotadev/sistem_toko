@@ -175,6 +175,7 @@ class PoService {
             tanggalJatuhTempo,
             updatedBy,
             ptId,
+            status,
             projectId
         } = payload;
         const result = await Po.update({
@@ -187,7 +188,21 @@ class PoService {
                 tanggalJatuhTempo,
                 updatedBy,
                 ptId,
+                status,
                 projectId
+            }
+        });
+        return result;
+    }
+
+    async updateStatusById(id: string, payload: PoDTO) {
+        const { status } = payload;
+        const result = await Po.update({
+            where: {
+                id
+            },
+            data: {
+                status
             }
         });
         return result;
