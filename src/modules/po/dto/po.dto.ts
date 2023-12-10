@@ -7,4 +7,5 @@ export default interface PoDTO {
     ptId: string
     status: string
     projectId: string
+    invoicePoId: string
 }

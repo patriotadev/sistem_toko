@@ -112,6 +112,7 @@ export async function getAllPo(req: Request, res: Response) {
             'document': {...result.document}
         });
     } catch (error) {
+        console.log(error);
         return res.status(500).send({
             'status': 'error',
             'code': 500,
@@ -137,6 +138,27 @@ export async function getPoById(req: Request, res: Response) {
         });
     }
 }
+
+export async function getPoByManyId(req: Request, res: Response) {
+    try {
+        const poService = new PoService();
+        console.log("queryyyyyy==>", req.query.id);
+        const result = await poService.findManyById(req.query.id);
+        return res.status(200).send({
+            'status': 'success',
+            'code': 200,
+            'data': result
+        });
+    } catch (error) {
+        return res.status(500).send({
+            'status': 'error',
+            'code': 500,
+            'message': 'Internal server error.'
+        });
+    }
+}
+
+
 
 export async function updateStatusPoById(req: Request, res: Response) {
     try {

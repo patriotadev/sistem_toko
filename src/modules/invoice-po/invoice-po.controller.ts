@@ -1,16 +1,29 @@
 import { Request, Response, NextFunction } from 'express';
 import InvoicePoService from './invoice-po.service';
+import { IPo } from '../po/interfaces/po.interface';
+import { InvoicePoListDTO } from './dto/invoice-po-list.dto';
+import { IParamsQuery } from './interfaces/invoice-po.interface';
 
 export async function createInvoicePo(req: Request, res: Response) {
     try {
         const invoicePoService = new InvoicePoService();
-        await invoicePoService.create(req.body);
+        const invoicePoRes = await invoicePoService.create(req.body);
+        const poListPayload: Omit<InvoicePoListDTO, "id">[] = [];
+        req.body.poListPayload.forEach((item: IPo) => {
+            poListPayload.push({
+                invoicePoId: invoicePoRes.id,
+                poId: item.id
+            });
+        });
+        console.log("PO LIST PAYLOAD ==>", poListPayload);
+        const invoicePoListRes = await invoicePoService.createInvoicePoList(poListPayload);
         return res.status(201).send({
             'status': 'success',
             'code': 201,
             'message': 'Data has been added successfully.'
         })
     } catch (error) {
+        console.log(error);
         return res.status(500).send({
             'status': 'error',
             'code': 500,
@@ -22,13 +35,15 @@ export async function createInvoicePo(req: Request, res: Response) {
 export async function getAllInvoicePo(req: Request, res: Response) {
     try {
         const invoicePoService = new InvoicePoService();
-        const result = await invoicePoService.findAll();
+        const result = await invoicePoService.findAll(req.query as unknown as IParamsQuery);
         return res.status(200).send({
             'status': 'success',
             'code': 200,
-            'data': result
+            'data': result.data,
+            'document': {...result.document}
         })
     } catch (error) {
+        console.log(error);
         return res.status(500).send({
             'status': 'error',
             'code': 500,
@@ -55,16 +70,23 @@ export async function getInvoicePoById(req: Request, res: Response) {
     }
 }
 
+
 export async function updateInvoicePoById(req: Request, res: Response) {
     try {
         const invoicePoService = new InvoicePoService();
-        await invoicePoService.updateOneById(req.body.id, req.body);
-        return res.status(200).send({
+        const invoicePoRes = await invoicePoService.updateOneById(req.body.id, req.body);
+        // const poListPayload: InvoicePoListDTO[] = [];
+        console.log("po list payload ===>", req.body.poListPayload);
+        await invoicePoService.deleteManyInvoicePoList(req.body.id)
+        await invoicePoService.createInvoicePoList(req.body.poListPayload);
+       
+        return res.status(201).send({
             'status': 'success',
-            'code': 200,
-            'message': 'Data has been updated successfully.'
+            'code': 201,
+            'message': 'Data has been added successfully.'
         })
     } catch (error) {
+        console.log(error);
         return res.status(500).send({
             'status': 'error',
             'code': 500,
@@ -76,6 +98,7 @@ export async function updateInvoicePoById(req: Request, res: Response) {
 export async function deleteInvoicePoById(req: Request, res: Response) {
     try {
         const invoicePoService = new InvoicePoService();
+        await invoicePoService.deleteManyInvoicePoList(req.body.id)
         await invoicePoService.deleteOneById(req.body.id);
         return res.status(200).send({
             'status': 'success',
@@ -83,6 +106,7 @@ export async function deleteInvoicePoById(req: Request, res: Response) {
             'message': 'Data has been deleted successfully.'
         })
     } catch (error) {
+        console.log(error);
         return res.status(500).send({
             'status': 'error',
             'code': 500,

@@ -16,11 +16,7 @@ class TandaTerimaNotaService {
     }
 
     async findAll() {
-        const result = await TandaTerimaNota.findMany({
-            include: {
-                InvoicePo: true
-            }
-        });
+        const result = await TandaTerimaNota.findMany();
         return result;
     }
 

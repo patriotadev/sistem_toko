@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import PoDTO from "./dto/po.dto";
 import { IParamsQuery } from "./interfaces/po.interface";
+import { ParsedUrlQuery } from "querystring";
 const Po = new PrismaClient().po;
 
 class PoService {
@@ -11,7 +12,7 @@ class PoService {
             tanggalJatuhTempo,
             createdBy,
             ptId,
-            projectId
+            projectId,
         } = payload;
         const result = await Po.create({
             data : {
@@ -21,7 +22,7 @@ class PoService {
                 createdBy,
                 ptId,
                 projectId,
-                status: 'Sedang Proses'
+                status: 'Sedang Proses',
             }
         });
         return result;
@@ -165,6 +166,23 @@ class PoService {
                 id
             }
         });
+        return result;
+    }
+
+    async findManyById(id: any) {
+        const poId = id?.split(", ");
+        console.log("po id listt==>", poId);
+        const result = await Po.findMany({
+            where: {
+                id: {
+                    in: poId
+                }
+            },
+            include: {
+                BarangPo: true
+            }
+        });
+        console.log("po list from invoice ==>", result);
         return result;
     }
 

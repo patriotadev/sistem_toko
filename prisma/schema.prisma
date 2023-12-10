@@ -111,22 +111,22 @@ model Project {
 }
 
 model Po {
-  id                String         @id @default(cuid())
-  noPo              String         @unique
+  id                String          @id @default(cuid())
+  noPo              String          @unique
   tanggal           DateTime
   tanggalJatuhTempo DateTime
   createdBy         String
-  createdAt         DateTime       @default(now())
+  createdAt         DateTime        @default(now())
   updatedBy         String?
-  updatedAt         DateTime?      @default(now())
-  Pt                Pt             @relation(fields: [ptId], references: [id])
+  updatedAt         DateTime?       @default(now())
+  Pt                Pt              @relation(fields: [ptId], references: [id])
   ptId              String
-  Project           Project        @relation(fields: [projectId], references: [id])
+  Project           Project         @relation(fields: [projectId], references: [id])
   projectId         String
   status            String
   SuratJalanPo      SuratJalanPo[]
-  InvoicePo         InvoicePo[]
   BarangPo          BarangPo[]
+  InvoicePoList     InvoicePoList[]
 }
 
 model SuratJalanPo {
@@ -144,27 +144,41 @@ model SuratJalanPo {
 }
 
 model TandaTerimaNota {
-  id        String      @id @default(cuid())
-  nomor     String
-  tanggal   DateTime
-  createdBy String
-  createdAt DateTime    @default(now())
-  updatedBy String?
-  updatedAt DateTime?   @default(now())
-  InvoicePo InvoicePo[]
+  id                  String                @id @default(cuid())
+  nomor               String
+  tanggal             DateTime
+  createdBy           String
+  createdAt           DateTime              @default(now())
+  updatedBy           String?
+  updatedAt           DateTime?             @default(now())
+  TandaTerimaNotaList TandaTerimaNotaList[]
+}
+
+model TandaTerimaNotaList {
+  id                String          @id @default(cuid())
+  TandaTerimaNota   TandaTerimaNota @relation(fields: [tandaTerimaNotaId], references: [id])
+  tandaTerimaNotaId String
+  InvoicePo         InvoicePo       @relation(fields: [invoicePoId], references: [id])
+  invoicePoId       String
 }
 
 model InvoicePo {
-  id                String          @id @default(cuid())
-  nomor             String
-  createdBy         String
-  createdAt         DateTime        @default(now())
-  updatedBy         String?
-  updatedAt         DateTime?       @default(now())
-  po                Po              @relation(fields: [poId], references: [id])
-  poId              String
-  tandaTerimaNota   TandaTerimaNota @relation(fields: [tandaTerimaNotaId], references: [id])
-  tandaTerimaNotaId String
+  id                  String                @id @default(cuid())
+  nomor               String
+  createdBy           String
+  createdAt           DateTime              @default(now())
+  updatedBy           String?
+  updatedAt           DateTime?             @default(now())
+  TandaTerimaNotaList TandaTerimaNotaList[]
+  InvoicePoList       InvoicePoList[]
+}
+
+model InvoicePoList {
+  id          String    @id @default(cuid())
+  InvoicePoId InvoicePo @relation(fields: [invoicePoId], references: [id])
+  invoicePoId String
+  Po          Po        @relation(fields: [poId], references: [id])
+  poId        String
 }
 
 model BarangPo {
