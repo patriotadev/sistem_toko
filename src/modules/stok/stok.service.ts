@@ -152,9 +152,11 @@ class StokService {
                 hargaModal,
                 hargaJual,
                 updatedBy,
-                tokoId
+                tokoId,
+                updatedAt: new Date()
             }
-        })
+        });
+        return result
     }
 
     async updateManyById(payload: Pick<StokDTO, "id" | "jumlah">[]) {

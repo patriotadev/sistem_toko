@@ -52,6 +52,25 @@ export async function getAllInvoicePo(req: Request, res: Response) {
     }
 }
 
+export async function getInvoicePoByManyId(req: Request, res: Response) {
+    try {
+        const invoicePoService = new InvoicePoService();
+        console.log("queryyyyyy==>", req.query.id);
+        const result = await invoicePoService.findManyById(req.query.id);
+        return res.status(200).send({
+            'status': 'success',
+            'code': 200,
+            'data': result
+        });
+    } catch (error) {
+        return res.status(500).send({
+            'status': 'error',
+            'code': 500,
+            'message': 'Internal server error.'
+        });
+    }
+}
+
 export async function getInvoicePoById(req: Request, res: Response) {
     try {
         const invoicePoService = new InvoicePoService();
@@ -82,8 +101,8 @@ export async function updateInvoicePoById(req: Request, res: Response) {
        
         return res.status(201).send({
             'status': 'success',
-            'code': 201,
-            'message': 'Data has been added successfully.'
+            'code': 200,
+            'message': 'Data has been updated successfully.'
         })
     } catch (error) {
         console.log(error);

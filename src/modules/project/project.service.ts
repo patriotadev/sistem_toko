@@ -117,6 +117,7 @@ class ProjectService {
             data : {
                 nama,
                 updatedBy,
+                updatedAt: new Date(),
                 ptId
             }
         });

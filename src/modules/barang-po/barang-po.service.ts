@@ -123,6 +123,7 @@ class BarangPoService {
                 isMaster,
                 poId,
                 stokBarangId,
+                updatedAt: new Date()
             }
         });
         return result;

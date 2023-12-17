@@ -41,16 +41,18 @@ export async function login(req: Request, res: Response, next: NextFunction) {
         const authService = new AuthService();
         const result = await authService.login(req.body);
         if (result) {
-            const accessToken = authService.generateAccessToken(result.user);
+            const accessToken = await authService.generateAccessToken(result.user);
             const refreshToken = authService.generateRefreshToken(result.user);
+            const userRole = await authService.getUserRole(result.user);
             await authService.postRefreshTokenToList(refreshToken, result.user);
-
+            console.log("Access Token==>", accessToken)
             return res.status(200).send({
                 "status": "Success",
                 "code": 200,
                 "data": {
                     accessToken,
-                    refreshToken
+                    refreshToken,
+                    role: userRole,                                                                                 
                 }
             });
         }

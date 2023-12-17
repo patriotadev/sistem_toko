@@ -77,6 +77,7 @@ class PtService {
                 alamat,
                 telepon,
                 updatedBy,
+                updatedAt: new Date()
             }
         });
 

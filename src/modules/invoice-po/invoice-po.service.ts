@@ -87,6 +87,23 @@ class InvoicePoService {
         return result;
     }
 
+    async findManyById(id: any) {
+        const invoicePoId = id?.split(", ");
+        console.log("po id listt==>", invoicePoId);
+        const result = await InvoicePo.findMany({
+            where: {
+                id: {
+                    in: invoicePoId
+                }
+            },
+            include: {
+                InvoicePoList: true
+            }
+        });
+        console.log("po list from invoice ==>", result);
+        return result;
+    }
+
     async updateOneById(id: string, payload: InvoicePoDTO) {
         const { nomor, updatedBy } = payload;
         const result = await InvoicePo.update({
@@ -95,7 +112,8 @@ class InvoicePoService {
             },
             data: {
                 nomor,
-                updatedBy
+                updatedBy,
+                updatedAt: new Date()
             }
         });
         return result;

@@ -4,15 +4,34 @@ import Jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 const User = new PrismaClient().user;
 const RefreshToken = new PrismaClient().refreshToken;
+const Role = new PrismaClient().role;
 
 export default class AuthService {
 
-    generateAccessToken(payload: AuthDTO) {
-        const token = Jwt.sign({id: payload.id, name: payload.name, email: payload.email},
+    async generateAccessToken(payload: AuthDTO) {
+        const token = Jwt.sign({
+            id: payload.id,
+            name: payload.name,
+            email: payload.email
+        },
             process.env.ACCESS_TOKEN as string,
             { expiresIn: "15m" }
         );
+       
         return token;
+    }
+
+    async getUserRole(payload: AuthDTO) {
+        const role = await Role.findUnique({
+            where: {
+                id: payload.roleId
+            },
+            include: {
+                RoleMenu: true
+            }
+        });
+        console.log("Role from service==>",role);
+        return role;
     }
 
     generateRefreshToken(payload: AuthDTO) {

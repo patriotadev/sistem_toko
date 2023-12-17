@@ -207,7 +207,8 @@ class PoService {
                 updatedBy,
                 ptId,
                 status,
-                projectId
+                projectId,
+                updatedAt: new Date()
             }
         });
         return result;
@@ -220,7 +221,8 @@ class PoService {
                 id
             },
             data: {
-                status
+                status,
+                updatedAt: new Date()
             }
         });
         return result;

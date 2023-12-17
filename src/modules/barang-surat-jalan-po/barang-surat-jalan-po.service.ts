@@ -39,7 +39,8 @@ class BarangSuratJalanPoService {
                 qty,
                 satuan,
                 updatedBy,
-                suratJalanPoId
+                suratJalanPoId,
+                updatedAt: new Date()
             }
         });
         return result;

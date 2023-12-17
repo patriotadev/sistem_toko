@@ -1,4 +1,4 @@
-export default interface TandaTerimaNotaDTO {
+export interface TandaTerimaNotaDTO {
     nomor: string
     tanggal: Date
     createdBy: string

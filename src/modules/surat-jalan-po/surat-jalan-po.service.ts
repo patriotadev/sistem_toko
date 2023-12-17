@@ -98,7 +98,8 @@ class SuratJalanPoService {
                 namaSupir,
                 updatedBy,
                 tanggal,
-                poId
+                poId,
+                updatedAt: new Date()
             }
         });
         return result;
