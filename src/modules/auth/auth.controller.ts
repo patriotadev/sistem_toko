@@ -44,6 +44,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
             const accessToken = await authService.generateAccessToken(result.user);
             const refreshToken = authService.generateRefreshToken(result.user);
             const userRole = await authService.getUserRole(result.user);
+            const userToko = await authService.getUserToko(result.user);
             await authService.postRefreshTokenToList(refreshToken, result.user);
             console.log("Access Token==>", accessToken)
             return res.status(200).send({
@@ -52,7 +53,8 @@ export async function login(req: Request, res: Response, next: NextFunction) {
                 "data": {
                     accessToken,
                     refreshToken,
-                    role: userRole,                                                                                 
+                    role: userRole,      
+                    toko: userToko,                                                                           
                 }
             });
         }

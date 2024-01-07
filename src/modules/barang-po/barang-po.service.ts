@@ -67,19 +67,6 @@ class BarangPoService {
             return firstStepQty?.qty - lastStepQty?.qty;
         }
         return null;
-        // const result = await BarangPo.aggregate({
-        //     where: {
-        //         stokBarangId,
-        //         step: {
-        //             lt: currentStep
-        //         }
-        //     },
-        //     _sum: {
-        //         qty: true
-        //     }
-
-        // })
-        // return result._sum.qty;
     }
 
     async findOneById(id: string) {

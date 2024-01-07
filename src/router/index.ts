@@ -12,6 +12,7 @@ import InvoicePoRouter from '../modules/invoice-po/invoice-po.route';
 import TandaTerimaNotaRouter from '../modules/tanda-terima-nota/tanda-terima-nota.route';
 import BarangSuratJalanPoRouter from '../modules/barang-surat-jalan-po/barang-surat-jalan-po.route';
 import UserRouter from '../modules/user/user.route';
+import PenjualanRouter from '../modules/penjualan/penjualan.route';
 
 const router = express.Router();
 
@@ -32,6 +33,7 @@ router.use('/api/invoice-po', InvoicePoRouter);
 router.use('/api/tanda-terima-nota', TandaTerimaNotaRouter);
 router.use('/api/barang-surat-jalan-po', BarangSuratJalanPoRouter);
 router.use('/api/user', UserRouter);
+router.use('/api/penjualan', PenjualanRouter);
 
 router.use((req: Request, res: Response) => {
     res.status(400).send('Invalid route.');

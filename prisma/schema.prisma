@@ -83,6 +83,7 @@ model StokBarang {
   tokoId             String
   BarangPo           BarangPo[]
   BarangSuratJalanPo BarangSuratJalanPo[]
+  BarangPenjualan    BarangPenjualan[]
 }
 
 model Pt {
@@ -223,7 +224,6 @@ model Penjualan {
   namaPelanggan       String
   kontakPelanggan     String
   alamatPelanggan     String
-  jumlahTotal         Int
   createdBy           String
   createdAt           DateTime              @default(now())
   updatedBy           String?
@@ -234,22 +234,44 @@ model Penjualan {
   SuratJalanPenjualan SuratJalanPenjualan[]
   Pembayaran          Pembayaran[]
   InvoicePenjualan    InvoicePenjualan[]
+  PembayaranPenjualan PembayaranPenjualan[]
+}
+
+model PembayaranPenjualan {
+  id              String    @id @default(cuid())
+  Penjualan       Penjualan @relation(fields: [penjualanId], references: [id])
+  penjualanId     String
+  totalPembayaran Int
+  jumlahBayar     Int
+  metode          String
+  isApprove       Boolean
+  createdBy       String
+  createdAt       DateTime  @default(now())
+  approvedAt      DateTime?
+  approvedBy      String?
+  updatedBy       String?
+  updatedAt       DateTime? @default(now())
 }
 
 model BarangPenjualan {
-  id          String    @id @default(cuid())
-  nama        String
-  qty         Int
-  satuan      String
-  discount    Int
-  harga       Int
-  jumlahHarga Int
-  createdBy   String
-  createdAt   DateTime  @default(now())
-  updatedBy   String?
-  updatedAt   DateTime? @default(now())
-  penjualan   Penjualan @relation(fields: [penjualanId], references: [id])
-  penjualanId String
+  id           String     @id @default(cuid())
+  kode         String
+  nama         String
+  qty          Int
+  satuan       String
+  discount     Int
+  harga        Int
+  jumlahHarga  Int
+  step         Int
+  isMaster     Boolean
+  createdBy    String
+  createdAt    DateTime   @default(now())
+  updatedBy    String?
+  updatedAt    DateTime?  @default(now())
+  penjualan    Penjualan  @relation(fields: [penjualanId], references: [id])
+  penjualanId  String
+  StokBarang   StokBarang @relation(fields: [stokBarangId], references: [id])
+  stokBarangId String
 }
 
 model SuratJalanPenjualan {

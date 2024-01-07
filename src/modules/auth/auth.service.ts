@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt';
 const User = new PrismaClient().user;
 const RefreshToken = new PrismaClient().refreshToken;
 const Role = new PrismaClient().role;
+const Toko = new PrismaClient().toko;
 
 export default class AuthService {
 
@@ -12,7 +13,8 @@ export default class AuthService {
         const token = Jwt.sign({
             id: payload.id,
             name: payload.name,
-            email: payload.email
+            email: payload.email,
+            tokoId: payload.tokoId
         },
             process.env.ACCESS_TOKEN as string,
             { expiresIn: "15m" }
@@ -32,6 +34,15 @@ export default class AuthService {
         });
         console.log("Role from service==>",role);
         return role;
+    }
+
+    async getUserToko(payload: AuthDTO) {
+        const toko = await Toko.findUnique({
+            where: {
+                id: payload.tokoId
+            }
+        });
+        return toko;
     }
 
     generateRefreshToken(payload: AuthDTO) {
