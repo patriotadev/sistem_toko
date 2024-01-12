@@ -4,6 +4,7 @@ import { IParamsQuery } from './interfaces/penjualan.interface';
 import { BarangPenjualanDTO, PembayaranPenjualanDTO } from './dto/penjualan.dto';
 import StokDTO from '../stok/dto/stok.dto';
 import StokService from '../stok/stok.service';
+const debug = require('debug')('hbpos-server:penjualan-controller');
 
 export async function createPenjualan(req: Request, res: Response) {
     try {
@@ -156,33 +157,12 @@ export async function getPoByManyId(req: Request, res: Response) {
     }
 }
 
-// export async function updateStatusPoById(req: Request, res: Response) {
-//     try {
-//         const poService = new PenjualanService();
-//         await poService.updateStatusById(req.body.po.id, req.body.po);
-//         return res.status(200).send({
-//             'status': 'success',
-//             'code': 201,
-//             'message': 'Data has been updated successfully.'
-//         });
-//     } catch (error) {
-//         console.log(error);
-//         return res.status(500).send({
-//             'status': 'error',
-//             'code': 500,
-//             'message': 'Internal server error.'
-//         });
-//     }
-// }
-
 export async function updatePenjualanById(req: Request, res: Response) {
     try {
         const penjualanService = new PenjualanService();
         await penjualanService.updateOneById(req.body.detail.id, req.body.detail);
-
         const barangMasterPayload: Omit<BarangPenjualanDTO, "id">[] = [];
-        const barangNextPayload: Omit<BarangPenjualanDTO, "id">[] = [];
-
+        let totalPembayaran:number = 0;
         req.body.barang.map((item: Omit<BarangPenjualanDTO, "id">) => {
             barangMasterPayload.push({
                 kode: item.kode,
@@ -199,11 +179,11 @@ export async function updatePenjualanById(req: Request, res: Response) {
                 createdBy: item.createdBy
             })
         });
-        const createNewMaster = await penjualanService.createBarang(barangMasterPayload);
-        barangMasterPayload.forEach(async (item) => {
+        await penjualanService.createBarang(barangMasterPayload);
+        await Promise.all(barangMasterPayload.map(async (item) => {
             const previousBarangQty = await penjualanService.findPreviousDifferenceQty(Number(item.step) - 2, Number(item.step) - 1, item.stokBarangId);
-            console.log(previousBarangQty, "<==previous Barang Po");
             const newQty = item.qty - Number(previousBarangQty);
+            totalPembayaran += Number(item.harga) * Number(newQty);
             await penjualanService.createBarang([{
                 kode: item.kode,
                 nama: item.nama,
@@ -217,8 +197,14 @@ export async function updatePenjualanById(req: Request, res: Response) {
                 penjualanId: req.body.detail.id,
                 stokBarangId: item.stokBarangId,
                 createdBy: item.createdBy
-            }])
+            }]);
+        })).then(async () => {
+            const findDetail = await penjualanService.findOneById(req.body.detail.id);
+            if (findDetail) {
+                await penjualanService.updateTotalPembayaran(findDetail?.PembayaranPenjualan[0].id, totalPembayaran);
+            }
         })
+
         return res.status(200).send({
             'status': 'success',
             'code': 200,

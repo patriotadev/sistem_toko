@@ -1,6 +1,7 @@
 import {Response, Request, NextFunction} from 'express';
 import StokService from './stok.service';
 import { IParamsQuery } from './interfaces/stok.interface';
+const debug = require('debug')('hbpos-server:stok-controller');
 
 export async function createStok(req: Request, res: Response) {
     try {
@@ -23,8 +24,9 @@ export async function createStok(req: Request, res: Response) {
 
 export async function getAllStok(req: Request, res: Response) {
     try {
-        console.log(req.query);
         const stokService = new StokService();
+        const hbCode = await stokService.findLastKode('HB');
+        debug(hbCode, ">>> HB LAST CODE");
         const result = await stokService.findAll(req.query as unknown as IParamsQuery);
         res.status(200).send({
             'status': 'success',
@@ -32,8 +34,6 @@ export async function getAllStok(req: Request, res: Response) {
             'data': result.data,
             'document': {...result.document}
         });
-        // console.log({'data': result.data,
-        // 'document': {...result.document}});
     } catch (error) {
         console.log(error);
         return res.status(500).send({

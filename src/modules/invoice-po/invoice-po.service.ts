@@ -4,17 +4,24 @@ import { InvoicePoListDTO } from "./dto/invoice-po-list.dto";
 import { IParamsQuery } from "./interfaces/invoice-po.interface";
 const InvoicePo = new PrismaClient().invoicePo;
 const InvoicePoList = new PrismaClient().invoicePoList;
+import moment from 'moment';
+const Toko = new PrismaClient().toko;
+const debug = require('debug')('hbpos-server:invoice-po-controller');
 
 class InvoicePoService {
     async create(payload: InvoicePoDTO) {
-        const { nomor, createdBy } = payload;
-        const result = await InvoicePo.create({
-            data: {
-                nomor,
-                createdBy
-            },
-        });
-        return result;
+        const { createdBy, tokoId } = payload;
+        const generateCode = await this.generateCode(tokoId, new Date());
+        debug(generateCode, ">>> GENERATE CODE INVOICE PO")
+        if (generateCode) {
+            const result = await InvoicePo.create({
+                data: {
+                    nomor: generateCode,
+                    createdBy
+                },
+            });
+            return result;
+        }
     }
 
     async createInvoicePoList(payload: Omit<InvoicePoListDTO, "id">[]) {
@@ -22,6 +29,43 @@ class InvoicePoService {
             data: [...(payload as [])]
         });
         return result
+    }
+
+    async generateCode(tokoId: string, createdAt: Date) {
+        const toko = await Toko.findUnique({
+            where: {
+                id: tokoId
+            }
+        });
+
+        if (toko) {
+            const tokoDescription = toko.description.split(" ");
+            let locationCode: string = '';
+            tokoDescription.map((item) => locationCode += item[0]);
+            const menuCode = 'INV';
+            const dateCode = moment(createdAt).format('DDMMYY');
+            const filterCode = `${locationCode}/${menuCode}/${dateCode}`;
+
+            const result = await InvoicePo.findMany({
+                where: {
+                    nomor: {
+                        contains: filterCode,
+                        mode: 'insensitive'
+                    }
+                },
+                orderBy: {
+                    id: 'desc'
+                }
+            });
+            if (result[0]) {
+                const lastNumber = result[0]?.nomor.split("/")[3];
+                if (lastNumber) {
+                    return `${locationCode}/${menuCode}/${dateCode}/${Number(lastNumber) + 1}`;
+                }
+            } else {
+                return `${locationCode}/${menuCode}/${dateCode}/1`;
+            }
+        }
     }
 
    async deleteManyInvoicePoList(invoicePoId: string) {
@@ -105,13 +149,12 @@ class InvoicePoService {
     }
 
     async updateOneById(id: string, payload: InvoicePoDTO) {
-        const { nomor, updatedBy } = payload;
+        const { updatedBy } = payload;
         const result = await InvoicePo.update({
             where: {
                 id
             },
             data: {
-                nomor,
                 updatedBy,
                 updatedAt: new Date()
             }

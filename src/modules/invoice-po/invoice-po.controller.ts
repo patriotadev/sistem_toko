@@ -9,19 +9,20 @@ export async function createInvoicePo(req: Request, res: Response) {
         const invoicePoService = new InvoicePoService();
         const invoicePoRes = await invoicePoService.create(req.body);
         const poListPayload: Omit<InvoicePoListDTO, "id">[] = [];
-        req.body.poListPayload.forEach((item: IPo) => {
-            poListPayload.push({
-                invoicePoId: invoicePoRes.id,
-                poId: item.id
+        if (invoicePoRes) {
+            req.body.poListPayload.forEach((item: IPo) => {
+                poListPayload.push({
+                    invoicePoId: invoicePoRes.id,
+                    poId: item.id
+                });
             });
-        });
-        console.log("PO LIST PAYLOAD ==>", poListPayload);
-        const invoicePoListRes = await invoicePoService.createInvoicePoList(poListPayload);
+        }
+        await invoicePoService.createInvoicePoList(poListPayload);
         return res.status(201).send({
             'status': 'success',
             'code': 201,
             'message': 'Data has been added successfully.'
-        })
+        });
     } catch (error) {
         console.log(error);
         return res.status(500).send({

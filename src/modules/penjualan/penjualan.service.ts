@@ -225,6 +225,9 @@ class PenjualanService {
         const result = await Penjualan.findUnique({
             where: {
                 id
+            },
+            include: {
+                PembayaranPenjualan: true
             }
         });
         return result;
@@ -270,7 +273,7 @@ class PenjualanService {
     }
 
     async updatePembayaran(payload: PembayaranPenjualanDTO) {
-        const { id, jumlahBayar, metode, updatedAt, updatedBy, isApprove, approvedAt, approvedBy } = payload
+        const { id, jumlahBayar, metode, updatedAt, updatedBy, isApprove, approvedAt, approvedBy } = payload;
         const result = await PembayaranPenjualan.update({
             where: {
                 id
@@ -283,6 +286,18 @@ class PenjualanService {
                 isApprove,
                 approvedAt,
                 approvedBy,
+            }
+        });
+        return result;
+    }
+
+    async updateTotalPembayaran(id: string, totalPembayaran: number) {
+        const result = await PembayaranPenjualan.update({
+            where: {
+                id
+            },
+            data: {
+                totalPembayaran
             }
         });
         return result;

@@ -5,8 +5,8 @@ export interface PoListPayload  {
 } 
 
 export interface InvoicePoDTO {
-    nomor: string
     createdBy: string
     updatedBy?: string
+    tokoId: string
     poListPayload: PoListPayload[]
 }

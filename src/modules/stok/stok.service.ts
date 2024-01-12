@@ -2,23 +2,62 @@ import { PrismaClient } from "@prisma/client";
 import StokDTO from "./dto/stok.dto";
 import {IParamsQuery} from './interfaces/stok.interface';
 const StokBarang = new PrismaClient().stokBarang;
+const Toko = new PrismaClient().toko;
+const debug = require('debug')('hbpos-server:stok-service');
 
 class StokService {
     async create(payload: StokDTO) {
-        const {kode, nama, jumlah, satuan, hargaModal, hargaJual, createdBy, tokoId} = payload
-        const result = await StokBarang.create({
-            data: {
-                kode,
-                nama,
-                jumlah,
-                satuan,
-                hargaModal,
-                hargaJual,
-                createdBy,
-                tokoId
+        const {nama, jumlah, satuan, hargaModal, hargaJual, createdBy, tokoId} = payload
+        const generateCode = await this.generateCode(tokoId);
+        debug(generateCode, "CREATE STOK GENERATE CODE");
+        if (generateCode) {
+            const result = await StokBarang.create({
+                data: {
+                    kode: generateCode,
+                    nama,
+                    jumlah,
+                    satuan,
+                    hargaModal,
+                    hargaJual,
+                    createdBy,
+                    tokoId
+                }
+            })
+            return result;
+        }
+        return false;
+    }
+
+    async generateCode(tokoId: string) {
+        const toko = await Toko.findUnique({
+            where: {
+                id: tokoId
             }
-        })
-        return result;
+        });
+        if (toko) {
+            const tokoDescription = toko.description.split(" ");
+            let locationCode: string = '';
+            tokoDescription.map((item) => locationCode += item[0]);
+            const result = await StokBarang.findMany({
+                where: {
+                    kode: {
+                        contains: locationCode,
+                        mode: 'insensitive'
+                    }
+                },
+                orderBy: {
+                    id: 'desc'
+                }
+            });
+            if (result[0]) {
+                const lastNumber = result[0]?.kode.split("-")[1];
+                if (lastNumber) {
+                    return `${locationCode}-${Number(lastNumber) + 1}`;
+                }
+            } else {
+                return `${locationCode}-1`;
+            }
+        }
     }
 
     async findAll({search, page, perPage, tokoId}: IParamsQuery) {
@@ -136,6 +175,21 @@ class StokService {
         });
         console.log(result, "==> result on service")
         return result;
+    }
+
+    async findLastKode(locationCode: string) {
+        const result = await StokBarang.findMany({
+            where: {
+                kode: {
+                    contains: locationCode,
+                    mode: 'insensitive'
+                }
+            },
+            orderBy: {
+                id: 'desc'
+            }
+        });
+        return result[0].kode;
     }
 
     async updateOneById(id: string, payload: StokDTO) {
