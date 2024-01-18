@@ -1,9 +1,9 @@
-import { PrismaClient } from "@prisma/client";
 import {BarangPenjualanDTO, PembayaranPenjualanDTO, PenjualanDTO} from "./dto/penjualan.dto";
 import { IParamsQuery } from "./interfaces/penjualan.interface";
-const Penjualan = new PrismaClient().penjualan;
-const BarangPenjualan = new PrismaClient().barangPenjualan;
-const PembayaranPenjualan = new PrismaClient().pembayaranPenjualan
+import prisma from "../../libs/prisma";
+const Penjualan = prisma.penjualan;
+const BarangPenjualan = prisma.barangPenjualan;
+const PembayaranPenjualan = prisma.pembayaranPenjualan
 
 class PenjualanService {
     async create(payload: PenjualanDTO) {

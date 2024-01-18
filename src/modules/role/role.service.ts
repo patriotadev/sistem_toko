@@ -1,6 +1,6 @@
-import { PrismaClient } from "@prisma/client";
 import RoleDTO from "./dto/role.dto";
-const Role = new PrismaClient().role;
+import prisma from "../../libs/prisma";
+const Role = prisma.role;
 
 class RoleService {
     async create(payload: RoleDTO) {

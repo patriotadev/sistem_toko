@@ -1,6 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "../../libs/prisma";
 import BarangSuratJalanPoDTO from "./dto/barang-surat-jalan-po.dto";
-const BarangSuratJalanPo = new PrismaClient().barangSuratJalanPo;
+const BarangSuratJalanPo = prisma.barangSuratJalanPo;
 
 class BarangSuratJalanPoService {
     async create(payload: Omit<BarangSuratJalanPoDTO, "id">[]) {

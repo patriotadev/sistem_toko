@@ -20,39 +20,41 @@ export async function createSuratJalanPo(req: Request, res: Response) {
         const barangSuratJalanPoPayload: Omit<BarangSuratJalanPoDTO, "id">[] = [];
         const stokBarangPayload: Pick<StokDTO, "id" | "jumlah">[] = [];
         console.log(req.body.barangPo, "<=== BARANG PO FROM FE");
-        Promise.all(req.body.barangPo.map(async(item: BarangSuratJalanPoDTO) => {
-            barangSuratJalanPoPayload.push({
-                kode: item.kode,
-                nama: item.nama,
-                qty: item.qty,
-                satuan: item.satuan,
-                suratJalanPoId: suratJalanPoResult.id,
-                createdBy: item.createdBy,
-                stokBarangId: item.stokBarangId
-            });
-            const barangPoLastStep = await barangPoService.findLastStep(req.body.suratJalan.poId, item.stokBarangId)
-            if (barangPoLastStep) {
-                await barangPoService.updateOneById(barangPoLastStep.id, {
-                    id: item.id,
+        if (suratJalanPoResult) {
+            Promise.all(req.body.barangPo.map(async(item: BarangSuratJalanPoDTO) => {
+                barangSuratJalanPoPayload.push({
                     kode: item.kode,
                     nama: item.nama,
-                    qty: Number(barangPoLastStep?.qty) - Number(item.qty),
+                    qty: item.qty,
                     satuan: item.satuan,
-                    discount: Number(barangPoLastStep?.discount),
-                    harga: Number(barangPoLastStep?.harga),
-                    poId: req.body.suratJalan.poId,
+                    suratJalanPoId: suratJalanPoResult.id,
                     createdBy: item.createdBy,
-                    isMaster: false,
-                    jumlahHarga: (Number(barangPoLastStep?.qty) - Number(item.qty)) * Number(barangPoLastStep?.harga),
-                    step: Number(barangPoLastStep?.step),
                     stokBarangId: item.stokBarangId
                 });
-            }
-            stokBarangPayload.push({
-                id: item.stokBarangId,
-                jumlah: item.qty
-            })
-        }));
+                const barangPoLastStep = await barangPoService.findLastStep(req.body.suratJalan.poId, item.stokBarangId)
+                if (barangPoLastStep) {
+                    await barangPoService.updateOneById(barangPoLastStep.id, {
+                        id: item.id,
+                        kode: item.kode,
+                        nama: item.nama,
+                        qty: Number(barangPoLastStep?.qty) - Number(item.qty),
+                        satuan: item.satuan,
+                        discount: Number(barangPoLastStep?.discount),
+                        harga: Number(barangPoLastStep?.harga),
+                        poId: req.body.suratJalan.poId,
+                        createdBy: item.createdBy,
+                        isMaster: false,
+                        jumlahHarga: (Number(barangPoLastStep?.qty) - Number(item.qty)) * Number(barangPoLastStep?.harga),
+                        step: Number(barangPoLastStep?.step),
+                        stokBarangId: item.stokBarangId
+                    });
+                }
+                stokBarangPayload.push({
+                    id: item.stokBarangId,
+                    jumlah: item.qty
+                })
+            }));
+        }
         await barangSuratJalanPoService.create(barangSuratJalanPoPayload);
         await stokService.updateManyById(stokBarangPayload);
         return res.status(201).send({

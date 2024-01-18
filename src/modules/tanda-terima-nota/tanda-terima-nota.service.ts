@@ -1,21 +1,63 @@
-import { PrismaClient } from "@prisma/client";
 import {TandaTerimaNotaDTO} from "./dto/tanda-terima-nota.dto";
 import { NotaListDTO } from "./dto/nota-list-dto";
 import { IParamsQuery } from "./interfaces/tanda-terima-nota.interface";
-const TandaTerimaNota = new PrismaClient().tandaTerimaNota;
-const TandaTerimaNotaList = new PrismaClient().tandaTerimaNotaList;
+import prisma from "../../libs/prisma";
+import moment from "moment";
+const TandaTerimaNota = prisma.tandaTerimaNota;
+const TandaTerimaNotaList = prisma.tandaTerimaNotaList;
+const Toko = prisma.toko;
 
 class TandaTerimaNotaService {
     async create(payload: TandaTerimaNotaDTO) {
-        const { nomor, tanggal, createdBy } = payload;
-        const result = await TandaTerimaNota.create({
-            data: {
-                nomor,
-                tanggal,
-                createdBy
+        const { tanggal, createdBy, tokoId } = payload;
+        const generateCode = await this.generateCode(tokoId, new Date());
+        if (generateCode) {
+            const result = await TandaTerimaNota.create({
+                data: {
+                    nomor: generateCode,
+                    tanggal,
+                    createdBy
+                }
+            });
+            return result;
+        }
+    }
+
+    async generateCode(tokoId: string, createdAt: Date) {
+        const toko = await Toko.findUnique({
+            where: {
+                id: tokoId
             }
         });
-        return result;
+
+        if (toko) {
+            const tokoDescription = toko.description.split(" ");
+            let locationCode: string = '';
+            tokoDescription.map((item) => locationCode += item[0]);
+            const menuCode = 'TTN';
+            const dateCode = moment(createdAt).format('DDMMYY');
+            const filterCode = `${locationCode}/${menuCode}/${dateCode}`;
+
+            const result = await TandaTerimaNota.findMany({
+                where: {
+                    nomor: {
+                        contains: filterCode,
+                        mode: 'insensitive'
+                    }
+                },
+                orderBy: {
+                    id: 'desc'
+                }
+            });
+            if (result[0]) {
+                const lastNumber = result[0]?.nomor.split("/")[3];
+                if (lastNumber) {
+                    return `${locationCode}/${menuCode}/${dateCode}/${Number(lastNumber) + 1}`;
+                }
+            } else {
+                return `${locationCode}/${menuCode}/${dateCode}/1`;
+            }
+        }
     }
 
     async createNotaList(payload: Omit<NotaListDTO, "id">[]) {
@@ -91,13 +133,12 @@ class TandaTerimaNotaService {
     }
 
     async updateOneById(id: string, payload: TandaTerimaNotaDTO) {
-        const { nomor, tanggal, updatedBy } = payload;
+        const { tanggal, updatedBy } = payload;
         const result = await TandaTerimaNota.update({
             where: {
                 id
             },
             data: {
-                nomor,
                 tanggal,
                 updatedBy,
                 updatedAt: new Date()

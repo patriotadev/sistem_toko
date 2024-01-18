@@ -1,21 +1,63 @@
-import { PrismaClient } from "@prisma/client";
 import SuratJalanPoDTO from "./dto/surat-jalan-po.dto";
 import { IParamsQuery } from "./interfaces/surat-jalan-po.interface";
-const SuratJalanPo = new PrismaClient().suratJalanPo;
+import prisma from "../../libs/prisma";
+import moment from "moment";
+const SuratJalanPo = prisma.suratJalanPo;
+const Toko = prisma.toko;
 
 class SuratJalanPoService {
     async create (payload: SuratJalanPoDTO) {
-        const { nomor, namaSupir, createdBy, tanggal, poId } = payload;
-        const result = await SuratJalanPo.create({
-            data : {
-                nomor,
-                namaSupir,
-                createdBy,
-                tanggal,
-                poId
+        const { namaSupir, createdBy, tanggal, poId, tokoId } = payload;
+        const generateCode = await this.generateCode(tokoId, new Date());
+        if (generateCode) {
+            const result = await SuratJalanPo.create({
+                data : {
+                    nomor: generateCode,
+                    namaSupir,
+                    createdBy,
+                    tanggal,
+                    poId
+                }
+            });
+            return result;
+        }
+    }
+
+    async generateCode(tokoId: string, createdAt: Date) {
+        const toko = await Toko.findUnique({
+            where: {
+                id: tokoId
             }
         });
-        return result;
+
+        if (toko) {
+            const tokoDescription = toko.description.split(" ");
+            let locationCode: string = '';
+            tokoDescription.map((item) => locationCode += item[0]);
+            const menuCode = 'SJ';
+            const dateCode = moment(createdAt).format('DDMMYY');
+            const filterCode = `${locationCode}/${menuCode}/${dateCode}`;
+
+            const result = await SuratJalanPo.findMany({
+                where: {
+                    nomor: {
+                        contains: filterCode,
+                        mode: 'insensitive'
+                    }
+                },
+                orderBy: {
+                    id: 'desc'
+                }
+            });
+            if (result[0]) {
+                const lastNumber = result[0]?.nomor.split("/")[3];
+                if (lastNumber) {
+                    return `${locationCode}/${menuCode}/${dateCode}/${Number(lastNumber) + 1}`;
+                }
+            } else {
+                return `${locationCode}/${menuCode}/${dateCode}/1`;
+            }
+        }
     }
 
     async findAll({search, page, perPage}: IParamsQuery) {
@@ -88,13 +130,12 @@ class SuratJalanPoService {
     }
 
     async updateOneById(id: string, payload: SuratJalanPoDTO) {
-        const { nomor, namaSupir, updatedBy, tanggal, poId } = payload;
+        const { namaSupir, updatedBy, tanggal, poId } = payload;
         const result = await SuratJalanPo.update({
             where: {
                 id
             },
             data: {
-                nomor,
                 namaSupir,
                 updatedBy,
                 tanggal,

@@ -1,11 +1,11 @@
-import { PrismaClient } from "@prisma/client";
 import {InvoicePoDTO} from "./dto/invoice-po.dto";
 import { InvoicePoListDTO } from "./dto/invoice-po-list.dto";
 import { IParamsQuery } from "./interfaces/invoice-po.interface";
-const InvoicePo = new PrismaClient().invoicePo;
-const InvoicePoList = new PrismaClient().invoicePoList;
+import prisma from "../../libs/prisma";
+const InvoicePo = prisma.invoicePo;
+const InvoicePoList = prisma.invoicePoList;
 import moment from 'moment';
-const Toko = new PrismaClient().toko;
+const Toko = prisma.toko;
 const debug = require('debug')('hbpos-server:invoice-po-controller');
 
 class InvoicePoService {

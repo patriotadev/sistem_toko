@@ -1,8 +1,8 @@
-import { PrismaClient } from "@prisma/client";
 import StokDTO from "./dto/stok.dto";
 import {IParamsQuery} from './interfaces/stok.interface';
-const StokBarang = new PrismaClient().stokBarang;
-const Toko = new PrismaClient().toko;
+import prisma from "../../libs/prisma";
+const StokBarang = prisma.stokBarang;
+const Toko = prisma.toko;
 const debug = require('debug')('hbpos-server:stok-service');
 
 class StokService {

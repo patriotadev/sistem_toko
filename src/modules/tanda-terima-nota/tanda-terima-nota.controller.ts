@@ -4,37 +4,20 @@ import { NotaListDTO } from './dto/nota-list-dto';
 import { IInvoicePo } from '../invoice-po/interfaces/invoice-po.interface';
 import { IParamsQuery } from './interfaces/tanda-terima-nota.interface';
 
-// export async function createTandaTerimaNota(req: Request, res: Response) {
-//     try {
-//         const tandaTerimaNotaService = new TandaTerimaNotaService();
-//         await tandaTerimaNotaService.create(req.body);
-//         return res.status(201).send({
-//             'status': 'success',
-//             'code': 201,
-//             'message': 'Data has been added successfully.'
-//         });
-//     } catch (error) {
-//         return res.status(500).send({
-//             'status': 'error',
-//             'code': 500,
-//             'message': 'Internal server error.'
-//         });
-//     }
-// }
-
 export async function createTandaTerimaNota(req: Request, res: Response) {
     try {
         const tandaTerimaNotaService = new TandaTerimaNotaService();
         const notaRes = await tandaTerimaNotaService.create(req.body);
         const invoicePoListPayload: Omit<NotaListDTO, "id">[] = [];
-        req.body.invoicePoListPayload.forEach((item: IInvoicePo) => {
-            invoicePoListPayload.push({
-                tandaTerimaNotaId: notaRes.id,
-                invoicePoId: item.id,
+        if (notaRes) {
+            req.body.invoicePoListPayload.forEach((item: IInvoicePo) => {
+                invoicePoListPayload.push({
+                    tandaTerimaNotaId: notaRes.id,
+                    invoicePoId: item.id,
+                });
             });
-        });
-        console.log("PO LIST PAYLOAD ==>", invoicePoListPayload);
-        const notaListRes = await tandaTerimaNotaService.createNotaList(invoicePoListPayload);
+        }
+        await tandaTerimaNotaService.createNotaList(invoicePoListPayload);
         return res.status(201).send({
             'status': 'success',
             'code': 201,

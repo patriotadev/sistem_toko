@@ -1,7 +1,7 @@
-import { PrismaClient } from '@prisma/client'
 import PtDTO from './dto/pt.dto';
 import { IParamsQuery } from './interfaces/pt.interface';
-const Pt = new PrismaClient().pt;
+import prisma from '../../libs/prisma';
+const Pt = prisma.pt;
 
 class PtService {
     async create(payload: PtDTO) {

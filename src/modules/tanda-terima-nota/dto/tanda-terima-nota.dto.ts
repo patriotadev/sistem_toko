@@ -1,5 +1,5 @@
 export interface TandaTerimaNotaDTO {
-    nomor: string
+    tokoId: string
     tanggal: Date
     createdBy: string
     updatedBy?: string

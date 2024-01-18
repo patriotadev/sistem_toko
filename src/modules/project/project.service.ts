@@ -1,7 +1,7 @@
-import { PrismaClient, Project } from "@prisma/client";
 import ProjectDTO from "./dto/project.dto";
 import { IParamsQuery } from "./interfaces/project.interface";
-const Project = new PrismaClient().project;
+import prisma from "../../libs/prisma";
+const Project = prisma.project;
 
 
 class ProjectService {

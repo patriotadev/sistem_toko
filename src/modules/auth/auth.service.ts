@@ -1,11 +1,11 @@
-import { PrismaClient } from "@prisma/client";
 import AuthDTO from "./dto/auth.dto";
 import Jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-const User = new PrismaClient().user;
-const RefreshToken = new PrismaClient().refreshToken;
-const Role = new PrismaClient().role;
-const Toko = new PrismaClient().toko;
+import prisma from "../../libs/prisma";
+const User = prisma.user;
+const RefreshToken = prisma.refreshToken;
+const Role = prisma.role;
+const Toko = prisma.toko;
 
 export default class AuthService {
 

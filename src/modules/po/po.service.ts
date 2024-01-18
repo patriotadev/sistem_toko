@@ -1,8 +1,7 @@
-import { PrismaClient } from "@prisma/client";
 import PoDTO from "./dto/po.dto";
 import { IParamsQuery } from "./interfaces/po.interface";
-import { ParsedUrlQuery } from "querystring";
-const Po = new PrismaClient().po;
+import prisma from "../../libs/prisma";
+const Po = prisma.po;
 
 class PoService {
     async create(payload: PoDTO) {
