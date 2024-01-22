@@ -68,22 +68,23 @@ model SubMenu {
 }
 
 model StokBarang {
-  id                 String               @id @default(cuid())
-  kode               String
-  nama               String
-  jumlah             Int
-  satuan             String
-  hargaModal         Int
-  hargaJual          Int
-  createdBy          String
-  createdAt          DateTime             @default(now())
-  updatedBy          String?
-  updatedAt          DateTime?            @default(now())
-  toko               Toko                 @relation(fields: [tokoId], references: [id])
-  tokoId             String
-  BarangPo           BarangPo[]
-  BarangSuratJalanPo BarangSuratJalanPo[]
-  BarangPenjualan    BarangPenjualan[]
+  id                        String                      @id @default(cuid())
+  kode                      String
+  nama                      String
+  jumlah                    Int
+  satuan                    String
+  hargaModal                Int
+  hargaJual                 Int
+  createdBy                 String
+  createdAt                 DateTime                    @default(now())
+  updatedBy                 String?
+  updatedAt                 DateTime?                   @default(now())
+  toko                      Toko                        @relation(fields: [tokoId], references: [id])
+  tokoId                    String
+  BarangPo                  BarangPo[]
+  BarangSuratJalanPo        BarangSuratJalanPo[]
+  BarangPenjualan           BarangPenjualan[]
+  BarangSuratJalanPenjualan BarangSuratJalanPenjualan[]
 }
 
 model Pt {
@@ -221,6 +222,7 @@ model BarangSuratJalanPo {
 
 model Penjualan {
   id                  String                @id @default(cuid())
+  nomor               String
   namaPelanggan       String
   kontakPelanggan     String
   alamatPelanggan     String
@@ -289,15 +291,18 @@ model SuratJalanPenjualan {
 
 model BarangSuratJalanPenjualan {
   id                    String              @id @default(cuid())
+  kode                  String
   nama                  String
   qty                   Int
-  satuan                Int
+  satuan                String
   createdBy             String
   createdAt             DateTime            @default(now())
   updatedBy             String?
   updatedAt             DateTime?           @default(now())
   suratJalanPenjualan   SuratJalanPenjualan @relation(fields: [suratJalanPenjualanId], references: [id])
   suratJalanPenjualanId String
+  StokBarang            StokBarang          @relation(fields: [stokBarangId], references: [id])
+  stokBarangId          String
 }
 
 model Pembayaran {

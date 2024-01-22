@@ -1,9 +1,12 @@
 import {BarangPenjualanDTO, PembayaranPenjualanDTO, PenjualanDTO} from "./dto/penjualan.dto";
 import { IParamsQuery } from "./interfaces/penjualan.interface";
 import prisma from "../../libs/prisma";
+import moment from "moment";
 const Penjualan = prisma.penjualan;
 const BarangPenjualan = prisma.barangPenjualan;
-const PembayaranPenjualan = prisma.pembayaranPenjualan
+const PembayaranPenjualan = prisma.pembayaranPenjualan;
+const Toko = prisma.toko;
+const debug = require('debug')('hbpos-server:penjualan-service');
 
 class PenjualanService {
     async create(payload: PenjualanDTO) {
@@ -14,16 +17,57 @@ class PenjualanService {
             createdBy,
             tokoId,
         } = payload;
-        const result = await Penjualan.create({
-            data : {
-                namaPelanggan,
-                kontakPelanggan,
-                alamatPelanggan,
-                createdBy,
-                tokoId,
+        const generateCode = await this.generateCode(tokoId, new Date());
+        if (generateCode) {
+            const result = await Penjualan.create({
+                data : {
+                    nomor: generateCode,
+                    namaPelanggan,
+                    kontakPelanggan,
+                    alamatPelanggan,
+                    createdBy,
+                    tokoId,
+                }
+            });
+            return result;
+        }
+    }
+
+    async generateCode(tokoId: string, createdAt: Date) {
+        const toko = await Toko.findUnique({
+            where: {
+                id: tokoId
             }
         });
-        return result;
+
+        if (toko) {
+            const tokoDescription = toko.description.split(" ");
+            let locationCode: string = '';
+            tokoDescription.map((item) => locationCode += item[0]);
+            const menuCode = 'PN';
+            const dateCode = moment(createdAt).format('DDMMYY');
+            const filterCode = `${locationCode}/${menuCode}/${dateCode}`;
+
+            const result = await Penjualan.findMany({
+                where: {
+                    nomor: {
+                        contains: filterCode,
+                        mode: 'insensitive'
+                    }
+                },
+                orderBy: {
+                    id: 'desc'
+                }
+            });
+            if (result[0]) {
+                const lastNumber = result[0]?.nomor.split("/")[3];
+                if (lastNumber) {
+                    return `${locationCode}/${menuCode}/${dateCode}/${Number(lastNumber) + 1}`;
+                }
+            } else {
+                return `${locationCode}/${menuCode}/${dateCode}/1`;
+            }
+        }
     }
 
     async createBarang(payload: Omit<BarangPenjualanDTO, "id">[]) {
@@ -303,19 +347,26 @@ class PenjualanService {
         return result;
     }
 
-    // async updateStatusById(id: string, payload: PoDTO) {
-    //     const { status } = payload;
-    //     const result = await Po.update({
-    //         where: {
-    //             id
-    //         },
-    //         data: {
-    //             status,
-    //             updatedAt: new Date()
-    //         }
-    //     });
-    //     return result;
-    // }
+    async findLastStep(penjualanId: string, stokBarangId: string) {
+        const maxStep = await BarangPenjualan.aggregate({
+            where: {
+                penjualanId,
+                stokBarangId
+            },
+            _max: {
+                step: true
+            }
+        });
+        debug("serviceeLastStepp=>", maxStep);
+        const result = await BarangPenjualan.findFirst({
+            where: {
+                penjualanId,
+                stokBarangId,
+                step: maxStep._max.step as number
+            }
+        });
+        return result;
+    }
 
     async findPreviousDifferenceQty(firstStep: number, lastStep: number, stokBarangId: string) {
         const firstStepQty = await BarangPenjualan.findFirst({
@@ -334,6 +385,42 @@ class PenjualanService {
             return firstStepQty?.qty - lastStepQty?.qty;
         }
         return null;
+    }
+
+    async updateOneBarangById(id: string, payload: BarangPenjualanDTO) {
+        const {  
+            kode,
+            nama,
+            qty,
+            satuan,
+            discount,
+            harga,
+            jumlahHarga,
+            step,
+            isMaster,
+            penjualanId,
+            stokBarangId,
+        } =  payload
+        const result = await BarangPenjualan.update({
+            where: {
+                id
+            },
+            data: {
+                kode,
+                nama,
+                qty: Number(qty),
+                satuan,
+                discount: Number(discount),
+                harga: Number(harga),
+                jumlahHarga: Number(jumlahHarga),
+                step,
+                isMaster,
+                penjualanId,
+                stokBarangId,
+                updatedAt: new Date()
+            }
+        });
+        return result;
     }
 
     async findBarangByPenjualanId(penjualanId: string) {

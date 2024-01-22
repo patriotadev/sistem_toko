@@ -14,58 +14,60 @@ export async function createPenjualan(req: Request, res: Response) {
         const penjualanResult = await penjualanService.create(req.body.detail);
         const barangMasterPayload: Omit<BarangPenjualanDTO, "id">[] = [];
         const stokBarangPayload: Pick<StokDTO, "id" | "jumlah">[] = [];
-        req.body.barang.map(async (item: Omit<BarangPenjualanDTO, "id">) => {
-            barangMasterPayload.push({
-                kode: item.kode,
-                nama: item.nama,
-                qty: item.qty,
-                satuan: item.satuan,
-                harga: item.harga,
-                jumlahHarga: item.jumlahHarga,
-                discount: item.discount,
-                step: 1,
-                isMaster: true,
-                penjualanId: penjualanResult.id,
-                stokBarangId: item.stokBarangId,
-                createdBy: item.createdBy
+        if (penjualanResult) {
+            req.body.barang.map(async (item: Omit<BarangPenjualanDTO, "id">) => {
+                barangMasterPayload.push({
+                    kode: item.kode,
+                    nama: item.nama,
+                    qty: item.qty,
+                    satuan: item.satuan,
+                    harga: item.harga,
+                    jumlahHarga: item.jumlahHarga,
+                    discount: item.discount,
+                    step: 1,
+                    isMaster: true,
+                    penjualanId: penjualanResult.id,
+                    stokBarangId: item.stokBarangId,
+                    createdBy: item.createdBy
+                });
+                stokBarangPayload.push({
+                    id: item.stokBarangId,
+                    jumlah: item.qty
+                });
             });
-            stokBarangPayload.push({
-                id: item.stokBarangId,
-                jumlah: item.qty
+            await penjualanService.createBarang(barangMasterPayload);
+            const barangPoPayload: Omit<BarangPenjualanDTO, "id">[] = [];
+            req.body.barang.map(async (item: Omit<BarangPenjualanDTO, "id">) => {
+                barangPoPayload.push({
+                    kode: item.kode,
+                    nama: item.nama,
+                    qty: item.qty,
+                    satuan: item.satuan,
+                    harga: item.harga,
+                    jumlahHarga: item.jumlahHarga,
+                    discount: item.discount,
+                    step: 2,
+                    isMaster: false,
+                    penjualanId: penjualanResult.id,
+                    stokBarangId: item.stokBarangId,
+                    createdBy: item.createdBy
+                })
             });
-        });
-        await penjualanService.createBarang(barangMasterPayload);
-        const barangPoPayload: Omit<BarangPenjualanDTO, "id">[] = [];
-        req.body.barang.map(async (item: Omit<BarangPenjualanDTO, "id">) => {
-            barangPoPayload.push({
-                kode: item.kode,
-                nama: item.nama,
-                qty: item.qty,
-                satuan: item.satuan,
-                harga: item.harga,
-                jumlahHarga: item.jumlahHarga,
-                discount: item.discount,
-                step: 2,
-                isMaster: false,
+            await penjualanService.createBarang(barangPoPayload);
+            await stokService.updateManyById(stokBarangPayload);
+            const pembayaranPayload = {
+                metode: req.body.pembayaran.metodePembayaran,
+                jumlahBayar: req.body.pembayaran.jumlahBayar,
+                totalPembayaran: req.body.pembayaran.totalPembayaran,
                 penjualanId: penjualanResult.id,
-                stokBarangId: item.stokBarangId,
-                createdBy: item.createdBy
-            })
-        });
-        await penjualanService.createBarang(barangPoPayload);
-        await stokService.updateManyById(stokBarangPayload);
-        const pembayaranPayload = {
-            metode: req.body.pembayaran.metodePembayaran,
-            jumlahBayar: req.body.pembayaran.jumlahBayar,
-            totalPembayaran: req.body.pembayaran.totalPembayaran,
-            penjualanId: penjualanResult.id,
-            isApprove: req.body.pembayaran.isApprove,
-            approvedAt: req.body.pembayaran.approvedAt,
-            approvedBy: req.body.pembayaran.approvedBy,
-            createdBy: req.body.pembayaran.createdBy,
-            createdAt: req.body.pembayaran.createdAt
-        };
-        await penjualanService.createPembayaran(pembayaranPayload)
+                isApprove: req.body.pembayaran.isApprove,
+                approvedAt: req.body.pembayaran.approvedAt,
+                approvedBy: req.body.pembayaran.approvedBy,
+                createdBy: req.body.pembayaran.createdBy,
+                createdAt: req.body.pembayaran.createdAt
+            };
+            await penjualanService.createPembayaran(pembayaranPayload)
+        }
         return res.status(201).send({
             'status': 'success',
             'code': 201,
@@ -104,6 +106,7 @@ export async function getAllPenjualan(req: Request, res: Response) {
     try {
         const penjualanService = new PenjualanService();
         const result = await penjualanService.findAll(req.query as unknown as IParamsQuery);
+        debug(result, ">>> RESULT PENJUALAN ON CONTROLLER")
         return res.status(200).send({
             'status': 'success',
             'code': 200,

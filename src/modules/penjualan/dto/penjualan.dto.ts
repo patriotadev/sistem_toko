@@ -1,4 +1,5 @@
 export interface PenjualanDTO {
+    id?: string
     namaPelanggan: string
     kontakPelanggan: string
     alamatPelanggan: string
@@ -9,7 +10,7 @@ export interface PenjualanDTO {
 }
 
 export interface BarangPenjualanDTO {
-    id: string
+    id?: string
     kode: string
     nama: string
     qty: number
