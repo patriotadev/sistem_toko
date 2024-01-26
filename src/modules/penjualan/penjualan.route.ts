@@ -4,17 +4,21 @@ import {
     deletePenjualanById,
     getAllPenjualan,
     getBarangByPenjualanId,
+    getPenjualanById,
+    getPenjualanByManyId,
     updatePembayaran,
     updatePenjualanById } from './penjualan.controller';
 import { cancelSuratJalanPenjualanById, createSuratJalanPenjualan, deleteSuratJalanPenjualanById, getAllSuratJalanPenjualan } from './surat-jalan-penjualan.controller';
 const router = express.Router();
 
-router.get('/', getAllPenjualan);
+router.get('/invoice', getPenjualanByManyId);
 router.get('/barang', getBarangByPenjualanId);
+router.get('/:id', getPenjualanById);
+router.put('/pembayaran', updatePembayaran);
+router.get('/', getAllPenjualan);
 router.post('/', createPenjualan);
 router.delete('/', deletePenjualanById);
 router.put('/', updatePenjualanById);
-router.put('/pembayaran', updatePembayaran);
 
 router.get('/surat-jalan', getAllSuratJalanPenjualan);
 router.post('/surat-jalan', createSuratJalanPenjualan);

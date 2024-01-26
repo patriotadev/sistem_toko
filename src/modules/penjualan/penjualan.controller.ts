@@ -123,10 +123,10 @@ export async function getAllPenjualan(req: Request, res: Response) {
     }
 }
 
-export async function getPoById(req: Request, res: Response) {
+export async function getPenjualanById(req: Request, res: Response) {
     try {
-        const poService = new PenjualanService();
-        const result = await poService.findOneById(req.params.id);
+        const penjualanService = new PenjualanService();
+        const result = await penjualanService.findOneById(req.params.id);
         return res.status(200).send({
             'status': 'success',
             'code': 200,
@@ -141,11 +141,11 @@ export async function getPoById(req: Request, res: Response) {
     }
 }
 
-export async function getPoByManyId(req: Request, res: Response) {
+export async function getPenjualanByManyId(req: Request, res: Response) {
     try {
-        const poService = new PenjualanService();
-        console.log("queryyyyyy==>", req.query.id);
-        const result = await poService.findManyById(req.query.id);
+        const penjualanService = new PenjualanService();
+        const result = await penjualanService.findManyById(req.query.id);
+        debug(req.query.id, ">> PAYLOAD QUERY");
         return res.status(200).send({
             'status': 'success',
             'code': 200,

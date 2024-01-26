@@ -96,7 +96,6 @@ class PenjualanService {
                     BarangPenjualan: true,
                     SuratJalanPenjualan: true,
                     PembayaranPenjualan: true,
-                    InvoicePenjualan: true
                 },
                 orderBy: {
                     createdAt: 'desc'
@@ -116,7 +115,6 @@ class PenjualanService {
                     BarangPenjualan: true,
                     SuratJalanPenjualan: true,
                     PembayaranPenjualan: true,
-                    InvoicePenjualan: true
                 },
                 orderBy: {
                     createdAt: 'desc'
@@ -136,7 +134,6 @@ class PenjualanService {
                     BarangPenjualan: true,
                     SuratJalanPenjualan: true,
                     PembayaranPenjualan: true,
-                    InvoicePenjualan: true
                 },
                 orderBy: {
                     createdAt: 'desc'
@@ -160,7 +157,6 @@ class PenjualanService {
                     BarangPenjualan: true,
                     SuratJalanPenjualan: true,
                     PembayaranPenjualan: true,
-                    InvoicePenjualan: true
                 },
                 orderBy: {
                     createdAt: 'desc'
@@ -179,7 +175,6 @@ class PenjualanService {
                     BarangPenjualan: true,
                     SuratJalanPenjualan: true,
                     PembayaranPenjualan: true,
-                    InvoicePenjualan: true
                 },
                 orderBy: {
                     createdAt: 'desc'
@@ -200,7 +195,6 @@ class PenjualanService {
                     BarangPenjualan: true,
                     SuratJalanPenjualan: true,
                     PembayaranPenjualan: true,
-                    InvoicePenjualan: true
                 },
                 orderBy: {
                     createdAt: 'desc'
@@ -221,7 +215,6 @@ class PenjualanService {
                     BarangPenjualan: true,
                     SuratJalanPenjualan: true,
                     PembayaranPenjualan: true,
-                    InvoicePenjualan: true
                 },
                 orderBy: {
                     createdAt: 'desc'
@@ -246,7 +239,6 @@ class PenjualanService {
                     BarangPenjualan: true,
                     SuratJalanPenjualan: true,
                     PembayaranPenjualan: true,
-                    InvoicePenjualan: true
                 },
                 orderBy: {
                     createdAt: 'desc'
@@ -286,7 +278,7 @@ class PenjualanService {
                 }
             },
         });
-        console.log("po list from invoice ==>", result);
+        debug(result);
         return result;
     }
 

@@ -221,22 +221,22 @@ model BarangSuratJalanPo {
 }
 
 model Penjualan {
-  id                  String                @id @default(cuid())
-  nomor               String
-  namaPelanggan       String
-  kontakPelanggan     String
-  alamatPelanggan     String
-  createdBy           String
-  createdAt           DateTime              @default(now())
-  updatedBy           String?
-  updatedAt           DateTime?             @default(now())
-  toko                Toko                  @relation(fields: [tokoId], references: [id])
-  tokoId              String
-  BarangPenjualan     BarangPenjualan[]
-  SuratJalanPenjualan SuratJalanPenjualan[]
-  Pembayaran          Pembayaran[]
-  InvoicePenjualan    InvoicePenjualan[]
-  PembayaranPenjualan PembayaranPenjualan[]
+  id                   String                 @id @default(cuid())
+  nomor                String
+  namaPelanggan        String
+  kontakPelanggan      String
+  alamatPelanggan      String
+  createdBy            String
+  createdAt            DateTime               @default(now())
+  updatedBy            String?
+  updatedAt            DateTime?              @default(now())
+  toko                 Toko                   @relation(fields: [tokoId], references: [id])
+  tokoId               String
+  BarangPenjualan      BarangPenjualan[]
+  SuratJalanPenjualan  SuratJalanPenjualan[]
+  Pembayaran           Pembayaran[]
+  PembayaranPenjualan  PembayaranPenjualan[]
+  InvoicePenjualanList InvoicePenjualanList[]
 }
 
 model PembayaranPenjualan {
@@ -317,8 +317,19 @@ model Pembayaran {
 }
 
 model InvoicePenjualan {
-  id          String    @id @default(cuid())
-  nomor       String
-  penjualan   Penjualan @relation(fields: [penjualanId], references: [id])
-  penjualanId String
+  id                   String                 @id @default(cuid())
+  nomor                String
+  createdBy            String
+  createdAt            DateTime               @default(now())
+  updatedBy            String?
+  updatedAt            DateTime?              @default(now())
+  InvoicePenjualanList InvoicePenjualanList[]
+}
+
+model InvoicePenjualanList {
+  id                 String           @id @default(cuid())
+  InvoicePenjualan   InvoicePenjualan @relation(fields: [invoicePenjualanId], references: [id])
+  invoicePenjualanId String
+  Penjualan          Penjualan        @relation(fields: [penjualanId], references: [id])
+  penjualanId        String
 }
