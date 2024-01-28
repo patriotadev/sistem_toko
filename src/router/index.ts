@@ -14,6 +14,7 @@ import BarangSuratJalanPoRouter from '../modules/barang-surat-jalan-po/barang-su
 import UserRouter from '../modules/user/user.route';
 import PenjualanRouter from '../modules/penjualan/penjualan.route';
 import InvoicePenjualanRouter from '../modules/invoice-penjualan/invoice-penjualan.route';
+import NotaPenjualanRouter from '../modules/nota-penjualan/nota-penjualan.route';
 
 const router = express.Router();
 
@@ -36,6 +37,7 @@ router.use('/api/barang-surat-jalan-po', BarangSuratJalanPoRouter);
 router.use('/api/user', UserRouter);
 router.use('/api/penjualan', PenjualanRouter);
 router.use('/api/invoice-penjualan', InvoicePenjualanRouter);
+router.use('/api/nota-penjualan', NotaPenjualanRouter);
 
 router.use((req: Request, res: Response) => {
     res.status(400).send('Invalid route.');

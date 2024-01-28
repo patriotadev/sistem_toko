@@ -324,6 +324,7 @@ model InvoicePenjualan {
   updatedBy            String?
   updatedAt            DateTime?              @default(now())
   InvoicePenjualanList InvoicePenjualanList[]
+  NotaPenjualanList    NotaPenjualanList[]
 }
 
 model InvoicePenjualanList {
@@ -332,4 +333,23 @@ model InvoicePenjualanList {
   invoicePenjualanId String
   Penjualan          Penjualan        @relation(fields: [penjualanId], references: [id])
   penjualanId        String
+}
+
+model NotaPenjualan {
+  id                String              @id @default(cuid())
+  nomor             String
+  tanggal           DateTime
+  createdBy         String
+  createdAt         DateTime            @default(now())
+  updatedBy         String?
+  updatedAt         DateTime?           @default(now())
+  NotaPenjualanList NotaPenjualanList[]
+}
+
+model NotaPenjualanList {
+  id                 String           @id @default(cuid())
+  NotaPenjualan      NotaPenjualan    @relation(fields: [notaPenjualanId], references: [id])
+  notaPenjualanId    String
+  InvoicePenjualan   InvoicePenjualan @relation(fields: [invoicePenjualanId], references: [id])
+  invoicePenjualanId String
 }

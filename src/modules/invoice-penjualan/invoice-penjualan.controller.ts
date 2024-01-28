@@ -3,6 +3,7 @@ import InvoicePenjualanService from './invoice-penjualan.service';
 import { IPenjualan } from '../penjualan/interfaces/penjualan.interface';
 import { InvoicePenjualanListDTO } from './dto/invoice-penjualan-list.dto';
 import { IParamsQuery } from './interfaces/invoice-penjualan.interface';
+import { debug } from 'console';
 
 export async function createInvoicePenjualan(req: Request, res: Response) {
     try {
@@ -56,7 +57,9 @@ export async function getAllInvoicePenjualan(req: Request, res: Response) {
 export async function getInvoicePenjualanByManyId(req: Request, res: Response) {
     try {
         const invoicePenjualanService = new InvoicePenjualanService();
+        debug(req.query.id, ">> id query");
         const result = await invoicePenjualanService.findManyById(req.query.id);
+        debug(result, ">> RESULTT");
         return res.status(200).send({
             'status': 'success',
             'code': 200,

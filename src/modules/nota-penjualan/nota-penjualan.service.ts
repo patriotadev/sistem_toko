@@ -1,18 +1,18 @@
-import {TandaTerimaNotaDTO} from "./dto/tanda-terima-nota.dto";
-import { NotaListDTO } from "./dto/nota-list-dto";
-import { IParamsQuery } from "./interfaces/tanda-terima-nota.interface";
+import {NotaPenjualanDTO} from "./dto/nota-penjualan.dto";
+import { NotaPenjualanListDTO } from "./dto/nota-penjualan-list.dto";
+import { IParamsQuery } from "./interfaces/nota-penjualan.interface";
 import prisma from "../../libs/prisma";
 import moment from "moment";
-const TandaTerimaNota = prisma.tandaTerimaNota;
-const TandaTerimaNotaList = prisma.tandaTerimaNotaList;
+const NotaPenjualan = prisma.notaPenjualan;
+const NotaPenjualanList = prisma.notaPenjualanList;
 const Toko = prisma.toko;
 
-class TandaTerimaNotaService {
-    async create(payload: TandaTerimaNotaDTO) {
+class NotaPenjualanService {
+    async create(payload: NotaPenjualanDTO) {
         const { tanggal, createdBy, tokoId } = payload;
         const generateCode = await this.generateCode(tokoId, new Date());
         if (generateCode) {
-            const result = await TandaTerimaNota.create({
+            const result = await NotaPenjualan.create({
                 data: {
                     nomor: generateCode,
                     tanggal,
@@ -34,11 +34,11 @@ class TandaTerimaNotaService {
             const tokoDescription = toko.description.split(" ");
             let locationCode: string = '';
             tokoDescription.map((item) => locationCode += item[0]);
-            const menuCode = 'TTN';
+            const menuCode = 'TTN-PN';
             const dateCode = moment(createdAt).format('DDMMYY');
             const filterCode = `${locationCode}/${menuCode}/${dateCode}`;
 
-            const result = await TandaTerimaNota.findMany({
+            const result = await NotaPenjualan.findMany({
                 where: {
                     nomor: {
                         contains: filterCode,
@@ -60,29 +60,29 @@ class TandaTerimaNotaService {
         }
     }
 
-    async createNotaList(payload: Omit<NotaListDTO, "id">[]) {
-        const result = await TandaTerimaNotaList.createMany({
+    async createNotaList(payload: Omit<NotaPenjualanListDTO, "id">[]) {
+        const result = await NotaPenjualanList.createMany({
             data: [...(payload as [])]
         });
         return result
     }
 
-    async deleteManyTandaTerimaNotaList(tandaTerimaNotaId: string) {
-        const result = await TandaTerimaNotaList.deleteMany({
+    async deleteManyNotaList(notaPenjualanId: string) {
+        const result = await NotaPenjualanList.deleteMany({
             where: {
-                tandaTerimaNotaId
+                notaPenjualanId
             }
         });
         return result;
    }
 
-    async findAll({search, page, perPage}: IParamsQuery) {
+   async findAll({search, page, perPage}: IParamsQuery) {
         const skipPage = Number(page) * 10 - 10;
-        const totalCount = await TandaTerimaNota.count();
+        const totalCount = await NotaPenjualan.count();
         const totalPages = Math.ceil(totalCount / perPage);
         let result;
         if (search !== 'undefined') {
-            result = await TandaTerimaNota.findMany({
+            result = await NotaPenjualan.findMany({
                 where: {
                     nomor: {
                         contains: search,
@@ -92,18 +92,18 @@ class TandaTerimaNotaService {
                 skip: skipPage,
                 take: Number(perPage),
                 include: {
-                    TandaTerimaNotaList:  true
+                    NotaPenjualanList:  true
                 },
                 orderBy: {
                     createdAt: 'desc'
                 }
             });
         } else {
-            result = await TandaTerimaNota.findMany({
+            result = await NotaPenjualan.findMany({
                 skip: skipPage,
                 take: Number(perPage),
                 include: {
-                    TandaTerimaNotaList: true
+                    NotaPenjualanList: true
                 },
                 orderBy: {
                     createdAt: 'desc'
@@ -122,7 +122,7 @@ class TandaTerimaNotaService {
     }
 
     async findOneById(id: string) {
-        const result = await TandaTerimaNota.findUnique({
+        const result = await NotaPenjualan.findUnique({
             where: {
                 id
             }
@@ -130,9 +130,9 @@ class TandaTerimaNotaService {
         return result;
     }
 
-    async updateOneById(id: string, payload: TandaTerimaNotaDTO) {
+    async updateOneById(id: string, payload: NotaPenjualanDTO) {
         const { tanggal, updatedBy } = payload;
-        const result = await TandaTerimaNota.update({
+        const result = await NotaPenjualan.update({
             where: {
                 id
             },
@@ -146,14 +146,13 @@ class TandaTerimaNotaService {
     }
 
     async deleteOneById(id: string) {
-        const result = await TandaTerimaNota.delete({
+        const result = await NotaPenjualan.delete({
             where: {
                 id
             }
         });
         return result;
     }
-   
 }
 
-export default TandaTerimaNotaService;
+export default NotaPenjualanService;
