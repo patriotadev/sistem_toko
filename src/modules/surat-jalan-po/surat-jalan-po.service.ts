@@ -1,9 +1,11 @@
 import SuratJalanPoDTO from "./dto/surat-jalan-po.dto";
-import { IParamsQuery } from "./interfaces/surat-jalan-po.interface";
+import { IParamsQuery, ISuratJalanPo } from "./interfaces/surat-jalan-po.interface";
 import prisma from "../../libs/prisma";
 import moment from "moment";
 const SuratJalanPo = prisma.suratJalanPo;
 const Toko = prisma.toko;
+const StokBarang = prisma.stokBarang;
+const BarangSuratJalanPo = prisma.barangSuratJalanPo;
 
 class SuratJalanPoService {
     async create (payload: SuratJalanPoDTO) {
@@ -147,6 +149,11 @@ class SuratJalanPoService {
     }
 
     async deleteOneById(id: string) {
+        await BarangSuratJalanPo.deleteMany({
+            where: {
+                suratJalanPoId: id
+            }
+        });
         const result = await SuratJalanPo.delete({
             where: {
                 id
@@ -154,6 +161,28 @@ class SuratJalanPoService {
         });
         return result;
     }
+
+    async cancel(payload: ISuratJalanPo) {
+        await this.deleteOneById(<string>payload.id);
+        const result = await Promise.all(payload.BarangSuratJalanPo.map(async (item) => {
+            const stok = await StokBarang.findUnique({
+                where: {
+                    id: item.stokBarangId
+                }
+            });
+            if (stok) {
+                await StokBarang.update({
+                    where: {
+                        id: item.stokBarangId
+                    },
+                    data: {
+                        jumlah: stok?.jumlah + item.qty
+                    }
+                });
+            }
+        }));
+        return result;
+    } 
 }
 
 export default SuratJalanPoService;

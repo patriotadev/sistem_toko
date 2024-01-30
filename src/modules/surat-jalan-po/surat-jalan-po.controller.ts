@@ -9,6 +9,7 @@ import { IParamsQuery } from './interfaces/surat-jalan-po.interface';
 import BarangPoService from '../barang-po/barang-po.service';
 import { BarangPo } from '@prisma/client';
 import BarangPoDTO from '../barang-po/dto/barang-po.dto';
+const debug = require('debug')('hbpos-server:surat-jalan-po-controller');
 
 export async function createSuratJalanPo(req: Request, res: Response) {
     try {
@@ -137,6 +138,28 @@ export async function deleteSuratJalanPoById(req: Request, res: Response) {
         });
     } catch (error) {
         console.log(error);
+        return res.status(500).send({
+            'status': 'error',
+            'code': 500,
+            'message': 'Internal server error.'
+        });
+    }
+}
+
+export async function cancelSuratJalanPoById(req: Request, res: Response) {
+    try {
+        const suratJalanPoService = new SuratJalanPoService();
+        const result = await suratJalanPoService.cancel(req.body);
+        debug(result)
+        if (result) {
+            return res.status(200).send({
+                'status': 'success',
+                'code': 200,
+                'message': 'Data has been cancelled successfully.'
+            });
+        }
+    } catch (error) {
+        debug(error);
         return res.status(500).send({
             'status': 'error',
             'code': 500,

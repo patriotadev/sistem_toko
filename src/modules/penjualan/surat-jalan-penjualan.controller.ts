@@ -11,6 +11,7 @@ export async function getAllSuratJalanPenjualan(req: Request, res: Response) {
     try {
         const suratJalanPenjualanService = new SuratJalanPenjualanService();
         const result = await suratJalanPenjualanService.findAll(req.query as unknown as IParamsQuery);
+        debug(result, ">>> resss")
         return res.status(200).send({
             'status': 'success',
             'code': 200,
@@ -36,7 +37,7 @@ export async function createSuratJalanPenjualan(req: Request, res: Response) {
         const suratJalanPenjualanResult = await suratJalanPenjualanService.create(req.body.detail);
         const barangSuratJalanPenjualanPayload: Omit<BarangSuratJalanPenjualanDTO, "id">[] = [];
         const stokBarangPayload: Pick<StokDTO, "id" | "jumlah">[] = [];
-
+        debug(suratJalanPenjualanResult, ">> SJP");
         if (suratJalanPenjualanResult) {
             Promise.all(req.body.barang.map(async(item: BarangSuratJalanPenjualanDTO) => {
                 barangSuratJalanPenjualanPayload.push({

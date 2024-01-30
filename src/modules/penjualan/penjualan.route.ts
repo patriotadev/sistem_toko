@@ -11,6 +11,11 @@ import {
 import { cancelSuratJalanPenjualanById, createSuratJalanPenjualan, deleteSuratJalanPenjualanById, getAllSuratJalanPenjualan } from './surat-jalan-penjualan.controller';
 const router = express.Router();
 
+router.get('/surat-jalan', getAllSuratJalanPenjualan);
+router.post('/surat-jalan', createSuratJalanPenjualan);
+router.delete('/surat-jalan', deleteSuratJalanPenjualanById);
+router.put('/surat-jalan/cancel', cancelSuratJalanPenjualanById);
+
 router.get('/invoice', getPenjualanByManyId);
 router.get('/barang', getBarangByPenjualanId);
 router.get('/:id', getPenjualanById);
@@ -20,9 +25,5 @@ router.post('/', createPenjualan);
 router.delete('/', deletePenjualanById);
 router.put('/', updatePenjualanById);
 
-router.get('/surat-jalan', getAllSuratJalanPenjualan);
-router.post('/surat-jalan', createSuratJalanPenjualan);
-router.delete('/surat-jalan', deleteSuratJalanPenjualanById);
-router.put('/surat-jalan/cancel', cancelSuratJalanPenjualanById);
 
 export default router;
