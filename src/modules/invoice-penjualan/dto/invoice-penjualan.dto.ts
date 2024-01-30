@@ -7,6 +7,7 @@ export interface PenjualanListPayload  {
 export interface InvoicePenjualanDTO {
     createdBy: string
     updatedBy?: string
+    status?: string
     tokoId: string
     penjualanListPayload: PenjualanListPayload[]
 }

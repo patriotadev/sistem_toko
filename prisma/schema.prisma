@@ -168,6 +168,7 @@ model InvoicePo {
   id                  String                @id @default(cuid())
   nomor               String
   createdBy           String
+  status              String
   createdAt           DateTime              @default(now())
   updatedBy           String?
   updatedAt           DateTime?             @default(now())
@@ -319,6 +320,7 @@ model Pembayaran {
 model InvoicePenjualan {
   id                   String                 @id @default(cuid())
   nomor                String
+  status               String
   createdBy            String
   createdAt            DateTime               @default(now())
   updatedBy            String?

@@ -17,6 +17,7 @@ class InvoicePenjualanService {
             const result = await InvoicePenjualan.create({
                 data: {
                     nomor: generateCode,
+                    status: 'Sedang Diproses',
                     createdBy
                 },
             });
@@ -159,6 +160,21 @@ async updateOneById(id: string, payload: InvoicePenjualanDTO) {
             updatedAt: new Date()
         }
     });
+    return result;
+}
+
+async updateStatusById(id: string, payload: InvoicePenjualanDTO) {
+    const { status } = payload;
+    const result = await InvoicePenjualan.update({
+        where: {
+            id
+        },
+        data: {
+            status,
+            updatedAt: new Date()
+        }
+    });
+    debug(result);
     return result;
 }
 

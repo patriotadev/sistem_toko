@@ -17,6 +17,7 @@ class InvoicePoService {
             const result = await InvoicePo.create({
                 data: {
                     nomor: generateCode,
+                    status: 'Sedang Diproses',
                     createdBy
                 },
             });
@@ -159,6 +160,21 @@ class InvoicePoService {
                 updatedAt: new Date()
             }
         });
+        return result;
+    }
+
+    async updateStatusById(id: string, payload: InvoicePoDTO) {
+        const { status } = payload;
+        const result = await InvoicePo.update({
+            where: {
+                id
+            },
+            data: {
+                status,
+                updatedAt: new Date()
+            }
+        });
+        debug(result);
         return result;
     }
 

@@ -5,7 +5,8 @@ import {
     getAllInvoicePenjualan,
     getInvoicePenjualanById,
     getInvoicePenjualanByManyId,
-    updateInvoicePenjualanById
+    updateInvoicePenjualanById,
+    updateStatusInvoiceById
 } from './invoice-penjualan.controller';
 const router = express.Router();
 
@@ -14,6 +15,7 @@ router.get('/', getAllInvoicePenjualan);
 router.get('/:id', getInvoicePenjualanById);
 router.post('/', createInvoicePenjualan);
 router.put('/', updateInvoicePenjualanById);
+router.put('/status', updateStatusInvoiceById);
 router.delete('/', deleteInvoicePenjualanById);
 
 export default router;

@@ -6,6 +6,7 @@ export interface PoListPayload  {
 
 export interface InvoicePoDTO {
     createdBy: string
+    status?: string
     updatedBy?: string
     tokoId: string
     poListPayload: PoListPayload[]
