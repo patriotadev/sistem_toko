@@ -9,12 +9,14 @@ const Toko = prisma.toko;
 
 class TandaTerimaNotaService {
     async create(payload: TandaTerimaNotaDTO) {
-        const { tanggal, createdBy, tokoId } = payload;
+        const { tanggal, jatuhTempo, createdBy, tokoId } = payload;
         const generateCode = await this.generateCode(tokoId, new Date());
         if (generateCode) {
             const result = await TandaTerimaNota.create({
                 data: {
                     nomor: generateCode,
+                    jatuhTempo: Number(jatuhTempo),
+                    status: 'Sedang Diproses',
                     tanggal,
                     createdBy
                 }
@@ -131,18 +133,31 @@ class TandaTerimaNotaService {
     }
 
     async updateOneById(id: string, payload: TandaTerimaNotaDTO) {
-        const { tanggal, updatedBy } = payload;
+        const { tanggal, jatuhTempo, updatedBy } = payload;
         const result = await TandaTerimaNota.update({
             where: {
                 id
             },
             data: {
                 tanggal,
+                jatuhTempo: Number(jatuhTempo),
                 updatedBy,
                 updatedAt: new Date()
             }
         });
         return result;
+    }
+
+    async updateStatusById(id: string, payload: TandaTerimaNotaDTO) {
+        const { status } = payload;
+        const result = await TandaTerimaNota.update({
+            where: {
+                id
+            },
+            data: {
+                status
+            }
+        })
     }
 
     async deleteOneById(id: string) {

@@ -5,6 +5,7 @@ export interface PoListPayload  {
 } 
 
 export interface InvoicePoDTO {
+    jatuhTempo: number
     createdBy: string
     status?: string
     updatedBy?: string

@@ -214,7 +214,9 @@ class StokService {
     }
 
     async updateManyById(payload: Pick<StokDTO, "id" | "jumlah">[]) {
-        payload.forEach(async (item, index) => {
+        debug(payload, ">>> BARANG PAYLOAD");
+        await Promise.all(payload.map( async(item) => {
+            debug(item, ">>> BARANG");
             const stokData = await StokBarang.findUnique({
                 where: {
                     id: item.id
@@ -223,15 +225,14 @@ class StokService {
             if (stokData) {
                 await StokBarang.update({
                     where: {
-                        id: stokData?.id
+                        id: item?.id
                     },
                     data: {
-                        ...stokData,
                         jumlah: stokData?.jumlah - item.jumlah
                     }
                 });
             }
-        })
+        }));
     }
 
     async deleteOneById(id: string) {

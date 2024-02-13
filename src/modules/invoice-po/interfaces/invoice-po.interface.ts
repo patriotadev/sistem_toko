@@ -12,6 +12,7 @@ export interface IInvoicePoList {
 
 export interface IInvoicePo {
     id: string
+    jatuhTempo: number
     nomor: string
     createdBy: string
     createdAt: Date

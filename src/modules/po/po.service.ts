@@ -8,7 +8,7 @@ class PoService {
         const { 
             noPo,
             tanggal,
-            tanggalJatuhTempo,
+            jatuhTempo,
             createdBy,
             ptId,
             projectId,
@@ -17,7 +17,7 @@ class PoService {
             data : {
                 noPo,
                 tanggal: new Date(tanggal),
-                tanggalJatuhTempo: new Date(tanggalJatuhTempo),
+                jatuhTempo: Number(jatuhTempo),
                 createdBy,
                 ptId,
                 projectId,
@@ -189,7 +189,7 @@ class PoService {
         const { 
             noPo,
             tanggal,
-            tanggalJatuhTempo,
+            jatuhTempo,
             updatedBy,
             ptId,
             status,
@@ -202,7 +202,7 @@ class PoService {
             data : {
                 noPo,
                 tanggal,
-                tanggalJatuhTempo,
+                jatuhTempo: Number(jatuhTempo),
                 updatedBy,
                 ptId,
                 status,

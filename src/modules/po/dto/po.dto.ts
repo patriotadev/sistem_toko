@@ -1,7 +1,7 @@
 export default interface PoDTO {
     noPo: string
     tanggal: Date
-    tanggalJatuhTempo: Date
+    jatuhTempo: number
     createdBy: string
     updatedBy?: string
     ptId: string

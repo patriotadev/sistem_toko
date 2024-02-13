@@ -10,12 +10,13 @@ const debug = require('debug')('hbpos-server:invoice-po-controller');
 
 class InvoicePoService {
     async create(payload: InvoicePoDTO) {
-        const { createdBy, tokoId } = payload;
+        const { jatuhTempo, createdBy, tokoId } = payload;
         const generateCode = await this.generateCode(tokoId, new Date());
         debug(generateCode, ">>> GENERATE CODE INVOICE PO")
         if (generateCode) {
             const result = await InvoicePo.create({
                 data: {
+                    jatuhTempo: Number(jatuhTempo),
                     nomor: generateCode,
                     status: 'Sedang Diproses',
                     createdBy
@@ -150,12 +151,13 @@ class InvoicePoService {
     }
 
     async updateOneById(id: string, payload: InvoicePoDTO) {
-        const { updatedBy } = payload;
+        const {jatuhTempo, updatedBy } = payload;
         const result = await InvoicePo.update({
             where: {
                 id
             },
             data: {
+                jatuhTempo: Number(jatuhTempo),
                 updatedBy,
                 updatedAt: new Date()
             }

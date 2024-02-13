@@ -22,7 +22,7 @@ export async function createSuratJalanPo(req: Request, res: Response) {
         const stokBarangPayload: Pick<StokDTO, "id" | "jumlah">[] = [];
         console.log(req.body.barangPo, "<=== BARANG PO FROM FE");
         if (suratJalanPoResult) {
-            Promise.all(req.body.barangPo.map(async(item: BarangSuratJalanPoDTO) => {
+            await Promise.all(req.body.barangPo.map(async(item: BarangSuratJalanPoDTO) => {
                 barangSuratJalanPoPayload.push({
                     kode: item.kode,
                     nama: item.nama,

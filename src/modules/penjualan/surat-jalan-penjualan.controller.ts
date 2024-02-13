@@ -39,7 +39,7 @@ export async function createSuratJalanPenjualan(req: Request, res: Response) {
         const stokBarangPayload: Pick<StokDTO, "id" | "jumlah">[] = [];
         debug(suratJalanPenjualanResult, ">> SJP");
         if (suratJalanPenjualanResult) {
-            Promise.all(req.body.barang.map(async(item: BarangSuratJalanPenjualanDTO) => {
+            await Promise.all(req.body.barang.map(async(item: BarangSuratJalanPenjualanDTO) => {
                 barangSuratJalanPenjualanPayload.push({
                     kode: item.kode,
                     nama: item.nama,

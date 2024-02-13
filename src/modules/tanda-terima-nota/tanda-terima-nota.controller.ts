@@ -92,6 +92,24 @@ export async function updateTandaTerimaNotaById(req: Request, res: Response) {
     }
 }
 
+export async function updateStatusNotaById(req: Request, res: Response) {
+    try {
+        const tandaTerimaNotaService = new TandaTerimaNotaService();
+        await tandaTerimaNotaService.updateStatusById(req.body.id, req.body);
+        return res.status(200).send({
+            'status': 'success',
+            'code': 200,
+            'message': 'Data has been updated successfully.'
+        })
+    } catch (error) {
+        return res.status(500).send({
+            'status': 'error',
+            'code': 500,
+            'message': 'Internal server error.'
+        });
+    }
+}
+
 export async function deleteTandaTerimaNotaById(req: Request, res: Response) {
     try {
         const tandaTerimaNotaService = new TandaTerimaNotaService();

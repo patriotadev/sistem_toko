@@ -113,22 +113,23 @@ model Project {
 }
 
 model Po {
-  id                String          @id @default(cuid())
-  noPo              String          @unique
-  tanggal           DateTime
-  tanggalJatuhTempo DateTime
-  createdBy         String
-  createdAt         DateTime        @default(now())
-  updatedBy         String?
-  updatedAt         DateTime?       @default(now())
-  Pt                Pt              @relation(fields: [ptId], references: [id])
-  ptId              String
-  Project           Project         @relation(fields: [projectId], references: [id])
-  projectId         String
-  status            String
-  SuratJalanPo      SuratJalanPo[]
-  BarangPo          BarangPo[]
-  InvoicePoList     InvoicePoList[]
+  id            String          @id @default(cuid())
+  noPo          String          @unique
+  tanggal       DateTime
+  jatuhTempo    Int
+  createdBy     String
+  createdAt     DateTime        @default(now())
+  updatedBy     String?
+  updatedAt     DateTime?       @default(now())
+  Pt            Pt              @relation(fields: [ptId], references: [id])
+  ptId          String
+  Project       Project         @relation(fields: [projectId], references: [id])
+  projectId     String
+  status        String
+  SuratJalanPo  SuratJalanPo[]
+  BarangPo      BarangPo[]
+  InvoicePoList InvoicePoList[]
+  PembayaranPo  PembayaranPo[]
 }
 
 model SuratJalanPo {
@@ -148,7 +149,9 @@ model SuratJalanPo {
 model TandaTerimaNota {
   id                  String                @id @default(cuid())
   nomor               String
+  jatuhTempo          Int
   tanggal             DateTime
+  status              String
   createdBy           String
   createdAt           DateTime              @default(now())
   updatedBy           String?
@@ -168,6 +171,7 @@ model InvoicePo {
   id                  String                @id @default(cuid())
   nomor               String
   createdBy           String
+  jatuhTempo          Int
   status              String
   createdAt           DateTime              @default(now())
   updatedBy           String?
@@ -238,6 +242,22 @@ model Penjualan {
   Pembayaran           Pembayaran[]
   PembayaranPenjualan  PembayaranPenjualan[]
   InvoicePenjualanList InvoicePenjualanList[]
+}
+
+model PembayaranPo {
+  id             String    @id @default(cuid())
+  Po             Po        @relation(fields: [poId], references: [id])
+  poId           String
+  totalPembayarn Int
+  jumlahBayar    Int
+  metode         String
+  isApprove      Boolean
+  createdBy      String
+  createdAt      DateTime  @default(now())
+  approvedAt     DateTime?
+  approveBy      String?
+  updatedBy      String?
+  updatedAt      DateTime? @default(now())
 }
 
 model PembayaranPenjualan {
