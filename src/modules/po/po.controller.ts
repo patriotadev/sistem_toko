@@ -3,10 +3,12 @@ import PoService from './po.service';
 import { IParamsQuery } from './interfaces/po.interface';
 import BarangPoService from '../barang-po/barang-po.service';
 import BarangPoDTO from '../barang-po/dto/barang-po.dto';
-import { Prisma } from '@prisma/client';
+const debug = require('debug')('hbpos-server:po-controller');
 
 export async function createPo(req: Request, res: Response) {
     try {
+        debug("=== createPo req.body  ===");
+        debug(req.body);
         const poService = new PoService();
         const barangPoService = new BarangPoService();
         const poResult = await poService.create(req.body.po);
@@ -45,7 +47,19 @@ export async function createPo(req: Request, res: Response) {
                 createdBy: item.createdBy
             })
         });
-        await barangPoService.create(barangPoPayload)
+        await barangPoService.create(barangPoPayload);
+        const pembayaranPayload = {
+            metode: req.body.pembayaran.metodePembayaran,
+            jumlahBayar: req.body.pembayaran.jumlahBayar,
+            totalPembayaran: req.body.pembayaran.totalPembayaran,
+            poId: poResult.id,
+            isApprove: req.body.pembayaran.isApprove,
+            approvedAt: req.body.pembayaran.approvedAt,
+            approvedBy: req.body.pembayaran.approvedBy,
+            createdBy: req.body.pembayaran.createdBy,
+            createdAt: req.body.pembayaran.createdAt
+        };
+        await poService.createPembayaran(pembayaranPayload);
         return res.status(201).send({
             'status': 'success',
             'code': 201,
@@ -101,10 +115,31 @@ export async function updateMaster(req: Request, res: Response) {
     }
 }
 
+export async function updatePembayaran(req: Request, res: Response) {
+    try {
+        const poService = new PoService();
+        await poService.updatePembayaran(req.body);
+        return res.status(200).send({
+            'status': 'success',
+            'code': 200,
+            'message': 'Data has been updated successfully.'
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({
+            'status': 'error',
+            'code': 500,
+            'message': 'Internal server error.'
+        });
+    }
+}
+
 export async function getAllPo(req: Request, res: Response) {
     try {
         const poService = new PoService();
         const result = await poService.findAll(req.query as unknown as IParamsQuery);
+        debug("=== getAllPo result ===")
+        debug(result)
         return res.status(200).send({
             'status': 'success',
             'code': 200,

@@ -245,19 +245,19 @@ model Penjualan {
 }
 
 model PembayaranPo {
-  id             String    @id @default(cuid())
-  Po             Po        @relation(fields: [poId], references: [id])
-  poId           String
-  totalPembayarn Int
-  jumlahBayar    Int
-  metode         String
-  isApprove      Boolean
-  createdBy      String
-  createdAt      DateTime  @default(now())
-  approvedAt     DateTime?
-  approveBy      String?
-  updatedBy      String?
-  updatedAt      DateTime? @default(now())
+  id              String    @id @default(cuid())
+  Po              Po        @relation(fields: [poId], references: [id])
+  poId            String
+  totalPembayaran Int
+  jumlahBayar     Int
+  metode          String
+  isApprove       Boolean
+  createdBy       String
+  createdAt       DateTime  @default(now())
+  approvedAt      DateTime?
+  approvedBy      String?
+  updatedBy       String?
+  updatedAt       DateTime? @default(now())
 }
 
 model PembayaranPenjualan {

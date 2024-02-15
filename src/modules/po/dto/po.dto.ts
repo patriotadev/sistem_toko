@@ -9,3 +9,18 @@ export default interface PoDTO {
     projectId: string
     invoicePoId: string
 }
+
+export interface PembayaranPoDTO {
+    id?: string
+    poId: string
+    totalPembayaran: number
+    jumlahBayar: number
+    metode: string
+    isApprove: boolean
+    approvedAt: Date
+    approvedBy: string
+    createdBy: string
+    createdAt: Date
+    updatedBy?: string
+    updatedAt?: Date
+}

@@ -66,7 +66,7 @@ export async function createPenjualan(req: Request, res: Response) {
                 createdBy: req.body.pembayaran.createdBy,
                 createdAt: req.body.pembayaran.createdAt
             };
-            await penjualanService.createPembayaran(pembayaranPayload)
+            await penjualanService.createPembayaran(pembayaranPayload);
         }
         return res.status(201).send({
             'status': 'success',

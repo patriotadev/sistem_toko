@@ -1,7 +1,8 @@
-import PoDTO from "./dto/po.dto";
+import PoDTO, { PembayaranPoDTO } from "./dto/po.dto";
 import { IParamsQuery } from "./interfaces/po.interface";
 import prisma from "../../libs/prisma";
 const Po = prisma.po;
+const PembayaranPo = prisma.pembayaranPo;
 
 class PoService {
     async create(payload: PoDTO) {
@@ -27,6 +28,32 @@ class PoService {
         return result;
     }
 
+    async createPembayaran(payload: PembayaranPoDTO) {
+        const result = PembayaranPo.create({data: {
+            ...payload
+        }});
+        return result;
+    }
+
+    async updatePembayaran(payload: PembayaranPoDTO) {
+        const { id, jumlahBayar, metode, updatedAt, updatedBy, isApprove, approvedAt, approvedBy } = payload;
+        const result = await PembayaranPo.update({
+            where: {
+                id
+            },
+            data: {
+                jumlahBayar: Number(jumlahBayar),
+                metode,
+                updatedAt,
+                updatedBy,
+                isApprove,
+                approvedAt,
+                approvedBy,
+            }
+        });
+        return result;
+    }
+
     async findAll({search, page, perPage, ptId, projectId}: IParamsQuery) {
         const skipPage = Number(page) * 10 - 10;
         const totalCount = await Po.count();
@@ -46,7 +73,8 @@ class PoService {
                     include: {
                         Pt: true,
                         Project: true,
-                        BarangPo: true
+                        BarangPo: true,
+                        PembayaranPo: true,
                     },
                     orderBy: {
                         createdAt: 'desc'
@@ -59,7 +87,8 @@ class PoService {
                     include: {
                         Pt: true,
                         Project: true,
-                        BarangPo: true
+                        BarangPo: true,
+                        PembayaranPo: true,
                     },
                     orderBy: {
                         createdAt: 'desc'
@@ -83,7 +112,8 @@ class PoService {
                         include: {
                             Pt: true,
                             Project: true,
-                            BarangPo: true
+                            BarangPo: true,
+                            PembayaranPo: true,
                         },
                         orderBy: {
                             createdAt: 'desc'
@@ -99,7 +129,8 @@ class PoService {
                         include: {
                             Pt: true,
                             Project: true,
-                            BarangPo: true
+                            BarangPo: true,
+                            PembayaranPo: true,
                         },
                         orderBy: {
                             createdAt: 'desc'
@@ -122,7 +153,8 @@ class PoService {
                         include: {
                             Pt: true,
                             Project: true,
-                            BarangPo: true
+                            BarangPo: true,
+                            PembayaranPo: true,
                         },
                         orderBy: {
                             createdAt: 'desc'
@@ -139,7 +171,8 @@ class PoService {
                         include: {
                             Pt: true,
                             Project: true,
-                            BarangPo: true
+                            BarangPo: true,
+                            PembayaranPo: true,
                         },
                         orderBy: {
                             createdAt: 'desc'
