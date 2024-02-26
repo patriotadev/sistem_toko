@@ -16,6 +16,7 @@ model Toko {
   User        User[]
   StokBarang  StokBarang[]
   Penjualan   Penjualan[]
+  StokPo      StokPo[]
 }
 
 model Role {
@@ -54,26 +55,32 @@ model RoleMenu {
 }
 
 model Menu {
-  id          String     @id @default(cuid())
-  description String
-  RoleMenu    RoleMenu[]
-  SubMenu     SubMenu[]
+  id       String     @id @default(cuid())
+  title    String
+  icon     String
+  pathname String
+  RoleMenu RoleMenu[]
+  SubMenu  SubMenu[]
 }
 
 model SubMenu {
-  id          String @id @default(cuid())
-  description String
-  parent      Menu   @relation(fields: [parentId], references: [id])
-  parentId    String
+  id       String @id @default(cuid())
+  title    String
+  icon     String
+  pathname String
+  parent   Menu   @relation(fields: [parentId], references: [id])
+  parentId String
 }
 
 model StokBarang {
   id                        String                      @id @default(cuid())
-  kode                      String
+  kode                      String                      @unique
   nama                      String
   jumlah                    Int
   satuan                    String
-  hargaModal                Int
+  hargaModal                Int                         @default(0)
+  jumlahPo                  Int                         @default(0)
+  isPo                      Boolean                     @default(false)
   hargaJual                 Int
   createdBy                 String
   createdAt                 DateTime                    @default(now())
@@ -85,6 +92,24 @@ model StokBarang {
   BarangSuratJalanPo        BarangSuratJalanPo[]
   BarangPenjualan           BarangPenjualan[]
   BarangSuratJalanPenjualan BarangSuratJalanPenjualan[]
+}
+
+model StokPo {
+  id         String    @id @default(cuid())
+  kode       String
+  nama       String
+  jumlah     Int
+  satuan     String
+  hargaJual  Int
+  tempStokId String
+  createdBy  String
+  createdAt  DateTime  @default(now())
+  updatedBy  String?
+  updatedAt  DateTime? @default(now())
+  Toko       Toko      @relation(fields: [tokoId], references: [id])
+  tokoId     String
+  Po         Po        @relation(fields: [poId], references: [id])
+  poId       String
 }
 
 model Pt {
@@ -116,7 +141,6 @@ model Po {
   id            String          @id @default(cuid())
   noPo          String          @unique
   tanggal       DateTime
-  jatuhTempo    Int
   createdBy     String
   createdAt     DateTime        @default(now())
   updatedBy     String?
@@ -130,6 +154,7 @@ model Po {
   BarangPo      BarangPo[]
   InvoicePoList InvoicePoList[]
   PembayaranPo  PembayaranPo[]
+  StokPo        StokPo[]
 }
 
 model SuratJalanPo {

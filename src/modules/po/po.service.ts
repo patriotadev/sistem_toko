@@ -3,13 +3,14 @@ import { IParamsQuery } from "./interfaces/po.interface";
 import prisma from "../../libs/prisma";
 const Po = prisma.po;
 const PembayaranPo = prisma.pembayaranPo;
+const debug = require('debug')('hbpos-server:po-service');
 
 class PoService {
     async create(payload: PoDTO) {
+        debug(payload, "create po payload")
         const { 
             noPo,
             tanggal,
-            jatuhTempo,
             createdBy,
             ptId,
             projectId,
@@ -18,7 +19,6 @@ class PoService {
             data : {
                 noPo,
                 tanggal: new Date(tanggal),
-                jatuhTempo: Number(jatuhTempo),
                 createdBy,
                 ptId,
                 projectId,
@@ -222,7 +222,6 @@ class PoService {
         const { 
             noPo,
             tanggal,
-            jatuhTempo,
             updatedBy,
             ptId,
             status,
@@ -235,7 +234,6 @@ class PoService {
             data : {
                 noPo,
                 tanggal,
-                jatuhTempo: Number(jatuhTempo),
                 updatedBy,
                 ptId,
                 status,
@@ -261,6 +259,11 @@ class PoService {
     }
 
     async deleteOneById(id: string) {
+        const pembayaranPo = await PembayaranPo.deleteMany({
+            where: {
+                poId: id
+            }
+        });
         const result = await Po.delete({
             where: {
                 id

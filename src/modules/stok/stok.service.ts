@@ -28,6 +28,44 @@ class StokService {
         return false;
     }
 
+    async createStokPo(payload: Omit<StokDTO, "id">[]) {
+        let counter = 0;
+        await Promise.all(payload.map(async (item, index) => {
+            const generateCode = await this.generateCode(item.tokoId);
+            const counter = Number(generateCode?.split('-')[1]) + index;
+            const newGenerateCode = `${generateCode?.split('-')[0]}-${counter}`
+            debug(generateCode, ">>> generateCode");
+            if (generateCode) {
+                if (item.kode === item.nama) {
+                    await StokBarang.create({
+                        data: {
+                            id: item.tempStokId,
+                            kode: newGenerateCode,
+                            nama: item.nama,
+                            jumlah: item.jumlah,
+                            jumlahPo: item.jumlahPo,
+                            isPo: item.isPo,
+                            satuan: item.satuan,
+                            hargaJual: item.hargaJual,
+                            createdBy: item.createdBy,
+                            tokoId: item.tokoId,
+                        }
+                    });
+                } else {
+                    debug(item.kode, ">>> item kode");
+                    await StokBarang.update({
+                        where: {
+                            kode: item.kode,
+                        },
+                        data: {
+                            jumlahPo: item.jumlahPo
+                        }
+                    })
+                }
+            }
+        }));
+    }
+
     async generateCode(tokoId: string) {
         const toko = await Toko.findUnique({
             where: {

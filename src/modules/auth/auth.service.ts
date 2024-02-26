@@ -2,10 +2,14 @@ import AuthDTO from "./dto/auth.dto";
 import Jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import prisma from "../../libs/prisma";
+const debug = require('debug')('hbpos-server:auth-service');
 const User = prisma.user;
 const RefreshToken = prisma.refreshToken;
 const Role = prisma.role;
 const Toko = prisma.toko;
+const Menu = prisma.menu;
+const RoleMenu = prisma.roleMenu;
+const SubMenu = prisma.subMenu;
 
 export default class AuthService {
 
@@ -43,6 +47,39 @@ export default class AuthService {
             }
         });
         return toko;
+    }
+
+    async getUserRoleMenu(payload: AuthDTO) {
+        debug(payload, ">>> getUserRoleMenu payload");
+        const roleMenu = await RoleMenu.findMany({
+            where: {
+                roleId: payload.roleId
+            },
+            include: {
+                menu: true
+            }
+        });
+        const data: any = [];
+        await Promise.all(roleMenu.map(async (menu) => {
+            const subMenu = await SubMenu.findMany({
+                where: {
+                    parentId: menu.menuId
+                }
+            });
+            if (subMenu.length > 0) {
+                data.push({
+                    ...menu.menu,
+                    subMenu
+                })
+            } else {
+                data.push({
+                    ...menu.menu
+                });
+            }
+        }));
+        debug(roleMenu, ">>> getUserRoleMenu result");
+        debug(data, ">>> getUserRoleMenu data");
+        return data;
     }
 
     generateRefreshToken(payload: AuthDTO) {

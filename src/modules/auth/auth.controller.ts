@@ -1,6 +1,7 @@
 import {Request, Response, NextFunction} from 'express';
 import AuthService from './auth.service';
 import {RegisterValidation, LoginValidation} from './validators/auth-validator';
+const debug = require('debug')('hbpos-server:auth-controller');
 
 export async function register(req: Request, res: Response) {
     try {
@@ -45,8 +46,10 @@ export async function login(req: Request, res: Response, next: NextFunction) {
             const refreshToken = authService.generateRefreshToken(result.user);
             const userRole = await authService.getUserRole(result.user);
             const userToko = await authService.getUserToko(result.user);
+            const userRoleMenu = await authService.getUserRoleMenu(result.user);
             await authService.postRefreshTokenToList(refreshToken, result.user);
             console.log("Access Token==>", accessToken)
+            debug(userRoleMenu, ">>> User Role Menu");
             return res.status(200).send({
                 "status": "Success",
                 "code": 200,
@@ -54,7 +57,8 @@ export async function login(req: Request, res: Response, next: NextFunction) {
                     accessToken,
                     refreshToken,
                     role: userRole,      
-                    toko: userToko,                                                                           
+                    toko: userToko, 
+                    userRoleMenu: userRoleMenu                                                                          
                 }
             });
         }

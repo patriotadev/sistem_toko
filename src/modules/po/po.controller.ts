@@ -3,6 +3,7 @@ import PoService from './po.service';
 import { IParamsQuery } from './interfaces/po.interface';
 import BarangPoService from '../barang-po/barang-po.service';
 import BarangPoDTO from '../barang-po/dto/barang-po.dto';
+import StokService from '../stok/stok.service';
 const debug = require('debug')('hbpos-server:po-controller');
 
 export async function createPo(req: Request, res: Response) {
@@ -11,7 +12,11 @@ export async function createPo(req: Request, res: Response) {
         debug(req.body);
         const poService = new PoService();
         const barangPoService = new BarangPoService();
+        const stokService = new StokService();
         const poResult = await poService.create(req.body.po);
+        if (req.body.stokPo.length > 0) {
+            await stokService.createStokPo(req.body.stokPo);
+        }
         const barangPoMasterPayload: Omit<BarangPoDTO, "id">[] = [];
         req.body.barangPo.map(async (item: Omit<BarangPoDTO, "id">) => {
             barangPoMasterPayload.push({
