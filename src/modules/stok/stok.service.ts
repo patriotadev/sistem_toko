@@ -1,6 +1,7 @@
 import StokDTO from "./dto/stok.dto";
 import {IParamsQuery} from './interfaces/stok.interface';
 import prisma from "../../libs/prisma";
+import TabStatus from "./enum/tab.enum";
 const StokBarang = prisma.stokBarang;
 const Toko = prisma.toko;
 const debug = require('debug')('hbpos-server:stok-service');
@@ -29,7 +30,6 @@ class StokService {
     }
 
     async createStokPo(payload: Omit<StokDTO, "id">[]) {
-        let counter = 0;
         await Promise.all(payload.map(async (item, index) => {
             const generateCode = await this.generateCode(item.tokoId);
             const counter = Number(generateCode?.split('-')[1]) + index;
@@ -98,97 +98,234 @@ class StokService {
         }
     }
 
-    async findAll({search, page, perPage, tokoId}: IParamsQuery) {
+    async findAll(payload: IParamsQuery) {
+        const {search, page, perPage, tokoId, tab} = payload;
         const skipPage = Number(page) * 10 - 10;
         const totalCount = await StokBarang.count();
         const totalPages = Math.ceil(totalCount / perPage);
         let result;
-        if (tokoId === 'all') {
-            if (search !== 'undefined') {
-                result = await StokBarang.findMany({
-                    where: {
-                        OR: [
-                            {
-                                nama: {
-                                    contains: search,
-                                    mode: 'insensitive'
-                                },
-                            },
-                            {
-                                kode: {
-                                    contains: search,
-                                    mode: 'insensitive'
-                                },
-                            }
 
-                        ]
-                    },
-                    skip: skipPage,
-                    take: Number(perPage),
-                    include: {
-                        toko: true
-                    },
-                    orderBy: {
-                        createdAt: 'desc'
-                    }
-                });
+        if (tab === TabStatus.STOK_TERSEDIA) {
+            if (tokoId === 'all') {
+                if (search !== 'undefined') {
+                    result = await StokBarang.findMany({
+                        where: {
+                            OR: [
+                                {
+                                    nama: {
+                                        contains: search,
+                                        mode: 'insensitive'
+                                    },
+                                },
+                                {
+                                    kode: {
+                                        contains: search,
+                                        mode: 'insensitive'
+                                    },
+                                }
+    
+                            ],
+                            isPo: false,
+                        },
+                        skip: skipPage,
+                        take: Number(perPage),
+                        include: {
+                            toko: true
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
+                        }
+                    });
+                } else {
+                    result = await StokBarang.findMany({
+                        skip: skipPage,
+                        where: {
+                            isPo: false
+                        },
+                        take: Number(perPage),
+                        include: {
+                            toko: true
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
+                        }
+                    });
+                }
             } else {
-                result = await StokBarang.findMany({
-                    skip: skipPage,
-                    take: Number(perPage),
-                    include: {
-                        toko: true
-                    },
-                    orderBy: {
-                        createdAt: 'desc'
-                    }
-                });
+                if (search !== 'undefined') {
+                    result = await StokBarang.findMany({
+                        where: {
+                            OR: [
+                                {
+                                    nama: {
+                                        contains: search,
+                                        mode: 'insensitive'
+                                    },
+                                },
+                                {
+                                    kode: {
+                                        contains: search,
+                                        mode: 'insensitive'
+                                    },
+                                }
+    
+                            ],
+                            isPo: false,
+                        },
+                        skip: skipPage,
+                        take: Number(perPage),
+                        include: {
+                            toko: true
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
+                        }
+                    });
+                } else {
+                    result = await StokBarang.findMany({
+                        where: {
+                            tokoId,
+                            isPo: false,
+                        },
+                        skip: skipPage,
+                        take: Number(perPage),
+                        include: {
+                            toko: true
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
+                        }
+                    });
+                }
             }
         } else {
-            if (search !== 'undefined') {
-                result = await StokBarang.findMany({
-                    where: {
-                        OR: [
-                            {
-                                nama: {
-                                    contains: search,
-                                    mode: 'insensitive'
+            if (tokoId === 'all') {
+                if (search !== 'undefined') {
+                    result = await StokBarang.findMany({
+                        where: {
+                            OR: [
+                                {
+                                    nama: {
+                                        contains: search,
+                                        mode: 'insensitive'
+                                    },
                                 },
-                            },
-                            {
-                                kode: {
-                                    contains: search,
-                                    mode: 'insensitive'
+                                {
+                                    kode: {
+                                        contains: search,
+                                        mode: 'insensitive'
+                                    },
                                 },
-                            }
-
-                        ]
-                    },
-                    skip: skipPage,
-                    take: Number(perPage),
-                    include: {
-                        toko: true
-                    },
-                    orderBy: {
-                        createdAt: 'desc'
-                    }
-                });
+                                {
+                                    isPo: true,
+                                },
+                                {
+                                    jumlahPo: {
+                                        gt: 0
+                                    }
+                                }
+                            ],
+                        },
+                        skip: skipPage,
+                        take: Number(perPage),
+                        include: {
+                            toko: true
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
+                        }
+                    });
+                } else {
+                    result = await StokBarang.findMany({
+                        skip: skipPage,
+                        where: {
+                            OR: [
+                                {
+                                    isPo: true,
+                                },
+                                {
+                                    jumlahPo: {
+                                        gt: 0
+                                    }
+                                }
+                            ]
+                        },
+                        take: Number(perPage),
+                        include: {
+                            toko: true
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
+                        }
+                    });
+                }
             } else {
-                result = await StokBarang.findMany({
-                    where: {
-                        tokoId
-                    },
-                    skip: skipPage,
-                    take: Number(perPage),
-                    include: {
-                        toko: true
-                    },
-                    orderBy: {
-                        createdAt: 'desc'
-                    }
-                });
+                if (search !== 'undefined') {
+                    result = await StokBarang.findMany({
+                        where: {
+                            OR: [
+                                {
+                                    nama: {
+                                        contains: search,
+                                        mode: 'insensitive'
+                                    },
+                                },
+                                {
+                                    kode: {
+                                        contains: search,
+                                        mode: 'insensitive'
+                                    },
+                                },
+                                {
+                                    isPo: true,
+                                },
+                                {
+                                    jumlahPo: {
+                                        gt: 0
+                                    }
+                                }
+                            ],
+                            isPo: true,
+                            jumlahPo: {
+                                gt: 0
+                            }
+                        },
+                        skip: skipPage,
+                        take: Number(perPage),
+                        include: {
+                            toko: true
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
+                        }
+                    });
+                } else {
+                    result = await StokBarang.findMany({
+                        where: {
+                            OR: [
+                                {
+                                    isPo: true,
+                                },
+                                {
+                                    jumlahPo: {
+                                        gt: 0
+                                    }
+                                }
+                            ]
+                        },
+                        skip: skipPage,
+                        take: Number(perPage),
+                        include: {
+                            toko: true
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
+                        }
+                    });
+                }
             }
         }
+
 
         return {
             data: result,

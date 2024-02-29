@@ -5,6 +5,7 @@ export interface IParamsQuery {
     page: number
     perPage: number,
     tokoId: string
+    tab: string
 }
 
 export interface IStok {

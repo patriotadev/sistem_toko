@@ -1,5 +1,5 @@
 export default interface SuratJalanPoDTO {
-    namaSupir: string
+    namaSupir?: string
     createdBy: string
     tanggal: Date
     updatedBy?: string

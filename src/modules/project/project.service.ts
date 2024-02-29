@@ -2,8 +2,8 @@ import ProjectDTO from "./dto/project.dto";
 import { IParamsQuery } from "./interfaces/project.interface";
 import prisma from "../../libs/prisma";
 const Project = prisma.project;
-
-
+const PembayaranPo = prisma.pembayaranPo;
+const debug = require('debug')('hbpos-server:project-service');
 class ProjectService {
     async create(payload: ProjectDTO) {
         const { nama, createdBy, ptId } = payload;
@@ -34,7 +34,8 @@ class ProjectService {
                     skip: skipPage,
                     take: Number(perPage),
                     include: {
-                        Pt: true
+                        Pt: true,
+                        Po: true
                     },
                     orderBy: {
                         createdAt: 'desc'
@@ -45,7 +46,8 @@ class ProjectService {
                     skip: skipPage,
                     take: Number(perPage),
                     include: {
-                        Pt: true
+                        Pt: true,
+                        Po: true
                     },
                     orderBy: {
                         createdAt: 'desc'
@@ -65,7 +67,8 @@ class ProjectService {
                     skip: skipPage,
                     take: Number(perPage),
                     include: {
-                        Pt: true
+                        Pt: true,
+                        Po: true
                     },
                     orderBy: {
                         createdAt: 'desc'
@@ -79,7 +82,8 @@ class ProjectService {
                     skip: skipPage,
                     take: Number(perPage),
                     include: {
-                        Pt: true
+                        Pt: true,
+                        Po: true
                     },
                     orderBy: {
                         createdAt: 'desc'
@@ -88,8 +92,27 @@ class ProjectService {
             }
         }
 
+        const tempResult: any = [];
+        await Promise.all(result.map(async (item) => {
+            const pembayaranPo = await PembayaranPo.findMany({
+                where: {
+                    poId: {
+                        in: item.Po.map((po) => po.id)
+                    }
+                },
+                include: {
+                    Po: true
+                }
+            });
+            tempResult.push({
+                ...item,
+                pembayaranPo
+            })
+        }))
+
+        debug(tempResult, ">>> tempResult");
         return {
-            data: result,
+            data: tempResult,
             document: {
                 currentPage: Number(page),
                 pageSize: Number(perPage),

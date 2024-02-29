@@ -25,8 +25,6 @@ export async function createStok(req: Request, res: Response) {
 export async function getAllStok(req: Request, res: Response) {
     try {
         const stokService = new StokService();
-        const hbCode = await stokService.findLastKode('HB');
-        debug(hbCode, ">>> HB LAST CODE");
         const result = await stokService.findAll(req.query as unknown as IParamsQuery);
         res.status(200).send({
             'status': 'success',

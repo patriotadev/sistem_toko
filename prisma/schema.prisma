@@ -160,7 +160,7 @@ model Po {
 model SuratJalanPo {
   id                 String               @id @default(cuid())
   nomor              String               @unique
-  namaSupir          String
+  namaSupir          String?
   tanggal            DateTime
   createdBy          String
   createdAt          DateTime             @default(now())
