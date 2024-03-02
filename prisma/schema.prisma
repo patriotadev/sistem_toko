@@ -166,8 +166,8 @@ model SuratJalanPo {
   createdAt          DateTime             @default(now())
   updatedBy          String?
   updatedAt          DateTime?            @default(now())
-  Po                 Po                   @relation(fields: [poId], references: [id], onDelete: Cascade)
-  poId               String
+  Po                 Po?                  @relation(fields: [poId], references: [id], onDelete: Cascade)
+  poId               String?
   BarangSuratJalanPo BarangSuratJalanPo[]
 }
 
