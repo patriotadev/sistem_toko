@@ -3,9 +3,14 @@ import { NotaListDTO } from "./dto/nota-list-dto";
 import { IParamsQuery } from "./interfaces/tanda-terima-nota.interface";
 import prisma from "../../libs/prisma";
 import moment from "moment";
+import { IInvoicePo } from "../invoice-po/interfaces/invoice-po.interface";
+import { InvoicePoDTO } from "../invoice-po/dto/invoice-po.dto";
 const TandaTerimaNota = prisma.tandaTerimaNota;
 const TandaTerimaNotaList = prisma.tandaTerimaNotaList;
 const Toko = prisma.toko;
+const InvoicePoList = prisma.invoicePoList;
+const InvoicePo = prisma.invoicePo;
+const Po = prisma.po;
 
 class TandaTerimaNotaService {
     async create(payload: TandaTerimaNotaDTO) {
@@ -16,7 +21,7 @@ class TandaTerimaNotaService {
                 data: {
                     nomor: generateCode,
                     jatuhTempo: Number(jatuhTempo),
-                    status: 'Sedang Diproses',
+                    status: 'Belum Tanda Terima',
                     tanggal,
                     createdBy
                 }
@@ -62,11 +67,34 @@ class TandaTerimaNotaService {
         }
     }
 
+    async updatePoStatus(payload: Omit<InvoicePoDTO, "id">[]) {
+        await Promise.all(payload.map(async (item) => {
+            await Po.update({
+                where: {
+                    id: item?.poId
+                },
+                data:{
+                    status: 'Belum Lunas'
+                }
+            });
+        }));
+    }
+
     async createNotaList(payload: Omit<NotaListDTO, "id">[]) {
+        await Promise.all(payload.map(async(item) => {
+            await InvoicePo.update({
+                where: {
+                    id: item.invoicePoId
+                },
+                data: {
+                    status: 'Sudah Tanda Terima'
+                }
+            })
+        }));
         const result = await TandaTerimaNotaList.createMany({
             data: [...(payload as [])]
         });
-        return result
+        return result;
     }
 
     async deleteManyTandaTerimaNotaList(tandaTerimaNotaId: string) {

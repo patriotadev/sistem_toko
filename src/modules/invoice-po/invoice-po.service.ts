@@ -10,16 +10,17 @@ const debug = require('debug')('hbpos-server:invoice-po-controller');
 
 class InvoicePoService {
     async create(payload: InvoicePoDTO) {
-        const { jatuhTempo, createdBy, tokoId } = payload;
+        const { createdBy, tokoId, poId, suratJalanPoId } = payload;
         const generateCode = await this.generateCode(tokoId, new Date());
         debug(generateCode, ">>> GENERATE CODE INVOICE PO")
         if (generateCode) {
             const result = await InvoicePo.create({
                 data: {
-                    jatuhTempo: Number(jatuhTempo),
                     nomor: generateCode,
-                    status: 'Sedang Diproses',
-                    createdBy
+                    poId: poId,
+                    suratJalanPoId: suratJalanPoId,
+                    createdBy,
+                    status: 'Belum Tanda Terima'
                 },
             });
             return result;
@@ -95,7 +96,10 @@ class InvoicePoService {
                 skip: skipPage,
                 take: Number(perPage),
                 include: {
-                    InvoicePoList:  true
+                    InvoicePoList:  true,
+                    SuratJalanPo: true,
+                    TandaTerimaNotaList: true,
+                    Po: true
                 },
                 orderBy: {
                     createdAt: 'desc'
@@ -106,13 +110,20 @@ class InvoicePoService {
                 skip: skipPage,
                 take: Number(perPage),
                 include: {
-                    InvoicePoList: true
+                    InvoicePoList: true,
+                    SuratJalanPo: true,
+                    TandaTerimaNotaList: true,
+                    Po: true
                 },
                 orderBy: {
                     createdAt: 'desc'
                 }
             });
         }
+
+        // NEW RESULT
+        // PT NAME
+        // BARANG SURAT JALAN PO
         return {
             data: result,
             document: {
@@ -151,13 +162,12 @@ class InvoicePoService {
     }
 
     async updateOneById(id: string, payload: InvoicePoDTO) {
-        const {jatuhTempo, updatedBy } = payload;
+        const { updatedBy } = payload;
         const result = await InvoicePo.update({
             where: {
                 id
             },
             data: {
-                jatuhTempo: Number(jatuhTempo),
                 updatedBy,
                 updatedAt: new Date()
             }
@@ -165,20 +175,20 @@ class InvoicePoService {
         return result;
     }
 
-    async updateStatusById(id: string, payload: InvoicePoDTO) {
-        const { status } = payload;
-        const result = await InvoicePo.update({
-            where: {
-                id
-            },
-            data: {
-                status,
-                updatedAt: new Date()
-            }
-        });
-        debug(result);
-        return result;
-    }
+    // async updateStatusById(id: string, payload: InvoicePoDTO) {
+    //     const { status } = payload;
+    //     const result = await InvoicePo.update({
+    //         where: {
+    //             id
+    //         },
+    //         data: {
+    //             status,
+    //             updatedAt: new Date()
+    //         }
+    //     });
+    //     debug(result);
+    //     return result;
+    // }
 
     async deleteOneById(id: string) {
         const result = await InvoicePo.delete({

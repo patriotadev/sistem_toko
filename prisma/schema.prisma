@@ -150,11 +150,13 @@ model Po {
   Project       Project         @relation(fields: [projectId], references: [id])
   projectId     String
   status        String
+  statusSJ      String
   SuratJalanPo  SuratJalanPo[]
   BarangPo      BarangPo[]
   InvoicePoList InvoicePoList[]
   PembayaranPo  PembayaranPo[]
   StokPo        StokPo[]
+  InvoicePo     InvoicePo[]
 }
 
 model SuratJalanPo {
@@ -169,6 +171,7 @@ model SuratJalanPo {
   Po                 Po?                  @relation(fields: [poId], references: [id], onDelete: Cascade)
   poId               String?
   BarangSuratJalanPo BarangSuratJalanPo[]
+  InvoicePo          InvoicePo[]
 }
 
 model TandaTerimaNota {
@@ -196,8 +199,11 @@ model InvoicePo {
   id                  String                @id @default(cuid())
   nomor               String
   createdBy           String
-  jatuhTempo          Int
+  SuratJalanPo        SuratJalanPo          @relation(fields: [suratJalanPoId], references: [id])
+  suratJalanPoId      String
   status              String
+  Po                  Po                    @relation(fields: [poId], references: [id])
+  poId                String
   createdAt           DateTime              @default(now())
   updatedBy           String?
   updatedAt           DateTime?             @default(now())

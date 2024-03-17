@@ -3,9 +3,11 @@ import TandaTerimaNotaService from './tanda-terima-nota.service';
 import { NotaListDTO } from './dto/nota-list-dto';
 import { IInvoicePo } from '../invoice-po/interfaces/invoice-po.interface';
 import { IParamsQuery } from './interfaces/tanda-terima-nota.interface';
+const debug = require('debug')('hbpos-server:tanda-terima-nota-controller');
 
 export async function createTandaTerimaNota(req: Request, res: Response) {
     try {
+        debug(req.body, ">>> req.body nota controller");
         const tandaTerimaNotaService = new TandaTerimaNotaService();
         const notaRes = await tandaTerimaNotaService.create(req.body);
         const invoicePoListPayload: Omit<NotaListDTO, "id">[] = [];
@@ -18,6 +20,7 @@ export async function createTandaTerimaNota(req: Request, res: Response) {
             });
         }
         await tandaTerimaNotaService.createNotaList(invoicePoListPayload);
+        await tandaTerimaNotaService.updatePoStatus(req.body.invoicePoListPayload);
         return res.status(201).send({
             'status': 'success',
             'code': 201,

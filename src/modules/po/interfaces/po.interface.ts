@@ -27,4 +27,5 @@ export interface IParamsQuery {
     perPage: number,
     ptId: string,
     projectId: string
+    status: string
 }

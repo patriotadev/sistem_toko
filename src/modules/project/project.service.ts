@@ -109,7 +109,6 @@ class ProjectService {
                 pembayaranPo
             })
         }))
-
         debug(tempResult, ">>> tempResult");
         return {
             data: tempResult,

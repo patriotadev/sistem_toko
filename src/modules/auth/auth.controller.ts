@@ -41,6 +41,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
         });
         const authService = new AuthService();
         const result = await authService.login(req.body);
+        debug(result, ">>> result");
         if (result) {
             const accessToken = await authService.generateAccessToken(result.user);
             const refreshToken = authService.generateRefreshToken(result.user);

@@ -9,12 +9,15 @@ import { IParamsQuery } from './interfaces/surat-jalan-po.interface';
 import BarangPoService from '../barang-po/barang-po.service';
 import { BarangPo } from '@prisma/client';
 import BarangPoDTO from '../barang-po/dto/barang-po.dto';
+import PoService from '../po/po.service';
+import PoDTO from '../po/dto/po.dto';
 const debug = require('debug')('hbpos-server:surat-jalan-po-controller');
 
 export async function createSuratJalanPo(req: Request, res: Response) {
     try {
         const suratJalanPoService = new SuratJalanPoService();
         const barangSuratJalanPoService = new BarangSuratJalanPoService();
+        const poService = new PoService();
         const barangPoService = new BarangPoService();
         const stokService = new StokService();
         const suratJalanPoResult = await suratJalanPoService.create(req.body.suratJalan);
@@ -34,6 +37,7 @@ export async function createSuratJalanPo(req: Request, res: Response) {
                 });
                 if (req.body.suratJalan.poId) {
                     const barangPoLastStep = await barangPoService.findLastStep(req.body.suratJalan.poId, item.stokBarangId)
+                    await poService.updateOneById(req.body.suratJalan.poId, { status: 'Sudah Diambil' } as unknown as PoDTO)
                     if (barangPoLastStep) {
                         await barangPoService.updateOneById(barangPoLastStep.id, {
                             id: item.id,

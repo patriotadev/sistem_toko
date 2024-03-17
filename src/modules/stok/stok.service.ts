@@ -35,6 +35,7 @@ class StokService {
             const counter = Number(generateCode?.split('-')[1]) + index;
             const newGenerateCode = `${generateCode?.split('-')[0]}-${counter}`
             debug(generateCode, ">>> generateCode");
+            debug(newGenerateCode, ">>> newGenerateCode");
             if (generateCode) {
                 if (item.kode === item.nama) {
                     await StokBarang.create({
@@ -84,12 +85,14 @@ class StokService {
                     }
                 },
                 orderBy: {
-                    id: 'desc'
+                    createdAt: 'desc'
                 }
             });
+            debug(result[0], ">>> result[0]");
             if (result[0]) {
                 const lastNumber = result[0]?.kode.split("-")[1];
                 if (lastNumber) {
+                    debug(lastNumber, "last genCode");
                     return `${locationCode}-${Number(lastNumber) + 1}`;
                 }
             } else {

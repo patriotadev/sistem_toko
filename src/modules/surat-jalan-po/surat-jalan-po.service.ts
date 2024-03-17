@@ -6,6 +6,8 @@ const SuratJalanPo = prisma.suratJalanPo;
 const Toko = prisma.toko;
 const StokBarang = prisma.stokBarang;
 const BarangSuratJalanPo = prisma.barangSuratJalanPo;
+const Pt = prisma.pt;
+const debug = require('debug')('hbpos-server:surat-jalan-po-controller');
 
 class SuratJalanPoService {
     async create (payload: SuratJalanPoDTO) {
@@ -18,7 +20,7 @@ class SuratJalanPoService {
                     namaSupir,
                     createdBy,
                     tanggal,
-                    poId
+                    poId,
                 }
             });
             return result;
@@ -91,7 +93,8 @@ class SuratJalanPoService {
                 take: Number(perPage),
                 include: {
                     Po: true,
-                    BarangSuratJalanPo: true
+                    BarangSuratJalanPo: true,
+                    InvoicePo: true,
                 },
                 orderBy: {
                     createdAt: 'desc'
@@ -103,16 +106,31 @@ class SuratJalanPoService {
                 take: Number(perPage),
                 include: {
                     Po: true,
-                    BarangSuratJalanPo: true
+                    BarangSuratJalanPo: true,
+                    InvoicePo: true
                 },
                 orderBy: {
                     createdAt: 'desc'
                 }
             });
         }
-      
+
+        let newResult: any[] = [];
+        await Promise.all(result.map(async(item) => {
+            const ptData = await Pt.findUnique({
+                where: {
+                    id: item.Po?.ptId
+                }
+            });
+            newResult.push({
+                ...item,
+                Pt: ptData
+            })
+        }));
+        
+        debug(result, ">>> res surat jalan po");
         return {
-            data: result,
+            data: newResult,
             document: {
                 currentPage: Number(page),
                 pageSize: Number(perPage),

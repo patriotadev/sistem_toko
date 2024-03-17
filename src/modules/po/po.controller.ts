@@ -141,6 +141,7 @@ export async function updatePembayaran(req: Request, res: Response) {
 
 export async function getAllPo(req: Request, res: Response) {
     try {
+        debug(req.query, ">>> getAllPo");
         const poService = new PoService();
         const result = await poService.findAll(req.query as unknown as IParamsQuery);
         debug("=== getAllPo result ===")
@@ -221,12 +222,10 @@ export async function updateStatusPoById(req: Request, res: Response) {
 
 export async function updatePoById(req: Request, res: Response) {
     try {
+        debug(req.body, ">> req.bodyy updateMaster");
         const poService = new PoService();
         const barangPoService = new BarangPoService();
         await poService.updateOneById(req.body.po.id, req.body.po);
-        // for (let index = 0; index < req.body.barangPo.length; index++) {
-        //     await barangPoService.updateOneById(req.body.barangPo[index].id, req.body.barangPo[index]);
-        // }
         const barangPoMasterPayload: Omit<BarangPoDTO, "id">[] = [];
         const barangPoNextPayload: Omit<BarangPoDTO, "id">[] = [];
         console.log(req.body.barangPo, "<===BarangPo");
@@ -265,9 +264,8 @@ export async function updatePoById(req: Request, res: Response) {
                 stokBarangId: item.stokBarangId,
                 createdBy: item.createdBy
             })
-        })
-        console.log(createNewMaster, "<==Update Barang Po");
-        console.log(barangPoMasterPayload[0].step + 2, "<===BarangPoStepInput")
+        });
+        await poService.updatePembayaran(req.body.pembayaran);
         return res.status(200).send({
             'status': 'success',
             'code': 200,

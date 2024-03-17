@@ -3,6 +3,8 @@ import { IParamsQuery } from "./interfaces/po.interface";
 import prisma from "../../libs/prisma";
 const Po = prisma.po;
 const PembayaranPo = prisma.pembayaranPo;
+const BarangSuratJalanPo = prisma.barangSuratJalanPo;
+const SuratJalanPo = prisma.suratJalanPo;
 const debug = require('debug')('hbpos-server:po-service');
 
 class PoService {
@@ -22,7 +24,8 @@ class PoService {
                 createdBy,
                 ptId,
                 projectId,
-                status: 'Sedang Proses',
+                status: 'Belum Diambil',
+                statusSJ: 'Parsial'
             }
         });
         return result;
@@ -36,12 +39,13 @@ class PoService {
     }
 
     async updatePembayaran(payload: PembayaranPoDTO) {
-        const { id, jumlahBayar, metode, updatedAt, updatedBy, isApprove, approvedAt, approvedBy } = payload;
+        const { id, totalPembayaran, jumlahBayar, metode, updatedAt, updatedBy, isApprove, approvedAt, approvedBy } = payload;
         const result = await PembayaranPo.update({
             where: {
                 id
             },
             data: {
+                totalPembayaran: Number(totalPembayaran),
                 jumlahBayar: Number(jumlahBayar),
                 metode,
                 updatedAt,
@@ -51,53 +55,26 @@ class PoService {
                 approvedBy,
             }
         });
+        if (result.totalPembayaran === result.jumlahBayar) {
+            await Po.update({
+                where: {
+                    id: result.poId
+                },
+                data: {
+                    status: 'Sudah Lunas'
+                }
+            });
+        }
         return result;
     }
 
-    async findAll({search, page, perPage, ptId, projectId}: IParamsQuery) {
+    async findAll({search, page, perPage, ptId, projectId, status}: IParamsQuery) {
         const skipPage = Number(page) * 10 - 10;
         const totalCount = await Po.count();
         const totalPages = Math.ceil(totalCount / perPage);
         let result;
-        if (ptId === 'all') {
-            if (search !== 'undefined') {
-                result = await Po.findMany({
-                    where: {
-                        noPo: {
-                            contains: search,
-                            mode: 'insensitive'
-                        },
-                    },
-                    skip: skipPage,
-                    take: Number(perPage),
-                    include: {
-                        Pt: true,
-                        Project: true,
-                        BarangPo: true,
-                        PembayaranPo: true,
-                    },
-                    orderBy: {
-                        createdAt: 'desc'
-                    }
-                });
-            } else {
-                result = await Po.findMany({
-                    skip: skipPage,
-                    take: Number(perPage),
-                    include: {
-                        Pt: true,
-                        Project: true,
-                        BarangPo: true,
-                        PembayaranPo: true,
-                    },
-                    orderBy: {
-                        createdAt: 'desc'
-                    }
-                });
-            }
-        } else {
-
-            if (projectId === 'all') {
+        if (status === 'all') {
+            if (ptId === 'all') {
                 if (search !== 'undefined') {
                     result = await Po.findMany({
                         where: {
@@ -105,7 +82,6 @@ class PoService {
                                 contains: search,
                                 mode: 'insensitive'
                             },
-                            ptId
                         },
                         skip: skipPage,
                         take: Number(perPage),
@@ -114,6 +90,7 @@ class PoService {
                             Project: true,
                             BarangPo: true,
                             PembayaranPo: true,
+                            SuratJalanPo: true,
                         },
                         orderBy: {
                             createdAt: 'desc'
@@ -121,9 +98,6 @@ class PoService {
                     });
                 } else {
                     result = await Po.findMany({
-                        where: {
-                            ptId
-                        },
                         skip: skipPage,
                         take: Number(perPage),
                         include: {
@@ -131,6 +105,7 @@ class PoService {
                             Project: true,
                             BarangPo: true,
                             PembayaranPo: true,
+                            SuratJalanPo: true,
                         },
                         orderBy: {
                             createdAt: 'desc'
@@ -138,6 +113,97 @@ class PoService {
                     });
                 }
             } else {
+    
+                if (projectId === 'all') {
+                    if (search !== 'undefined') {
+                        result = await Po.findMany({
+                            where: {
+                                noPo: {
+                                    contains: search,
+                                    mode: 'insensitive'
+                                },
+                                ptId
+                            },
+                            skip: skipPage,
+                            take: Number(perPage),
+                            include: {
+                                Pt: true,
+                                Project: true,
+                                BarangPo: true,
+                                PembayaranPo: true,
+                                SuratJalanPo: true,
+                            },
+                            orderBy: {
+                                createdAt: 'desc'
+                            }
+                        });
+                    } else {
+                        result = await Po.findMany({
+                            where: {
+                                ptId
+                            },
+                            skip: skipPage,
+                            take: Number(perPage),
+                            include: {
+                                Pt: true,
+                                Project: true,
+                                BarangPo: true,
+                                PembayaranPo: true,
+                                SuratJalanPo: true,
+                            },
+                            orderBy: {
+                                createdAt: 'desc'
+                            }
+                        });
+                    }
+                } else {
+                    if (search !== 'undefined') {
+                        result = await Po.findMany({
+                            where: {
+                                noPo: {
+                                    contains: search,
+                                    mode: 'insensitive'
+                                },
+                                ptId,
+                                projectId
+                            },
+                            skip: skipPage,
+                            take: Number(perPage),
+                            include: {
+                                Pt: true,
+                                Project: true,
+                                BarangPo: true,
+                                PembayaranPo: true,
+                                SuratJalanPo: true,
+                            },
+                            orderBy: {
+                                createdAt: 'desc'
+                            }
+                        });
+                    } else {
+                        result = await Po.findMany({
+                            where: {
+                                ptId,
+                                projectId
+                            },
+                            skip: skipPage,
+                            take: Number(perPage),
+                            include: {
+                                Pt: true,
+                                Project: true,
+                                BarangPo: true,
+                                PembayaranPo: true,
+                                SuratJalanPo: true,
+                            },
+                            orderBy: {
+                                createdAt: 'desc'
+                            }
+                        });
+                    }
+                }
+            }
+        } else {
+            if (ptId === 'all') {
                 if (search !== 'undefined') {
                     result = await Po.findMany({
                         where: {
@@ -145,8 +211,7 @@ class PoService {
                                 contains: search,
                                 mode: 'insensitive'
                             },
-                            ptId,
-                            projectId
+                            status
                         },
                         skip: skipPage,
                         take: Number(perPage),
@@ -155,6 +220,7 @@ class PoService {
                             Project: true,
                             BarangPo: true,
                             PembayaranPo: true,
+                            SuratJalanPo: true,
                         },
                         orderBy: {
                             createdAt: 'desc'
@@ -162,27 +228,158 @@ class PoService {
                     });
                 } else {
                     result = await Po.findMany({
-                        where: {
-                            ptId,
-                            projectId
-                        },
                         skip: skipPage,
                         take: Number(perPage),
+                        where: {
+                            status
+                        },
                         include: {
                             Pt: true,
                             Project: true,
                             BarangPo: true,
                             PembayaranPo: true,
+                            SuratJalanPo: true,
                         },
                         orderBy: {
                             createdAt: 'desc'
                         }
                     });
+                }
+            } else {
+    
+                if (projectId === 'all') {
+                    if (search !== 'undefined') {
+                        result = await Po.findMany({
+                            where: {
+                                noPo: {
+                                    contains: search,
+                                    mode: 'insensitive'
+                                },
+                                ptId,
+                                status
+                            },
+                            skip: skipPage,
+                            take: Number(perPage),
+                            include: {
+                                Pt: true,
+                                Project: true,
+                                BarangPo: true,
+                                PembayaranPo: true,
+                                SuratJalanPo: true,
+                            },
+                            orderBy: {
+                                createdAt: 'desc'
+                            }
+                        });
+                    } else {
+                        result = await Po.findMany({
+                            where: {
+                                ptId,
+                                status
+                            },
+                            skip: skipPage,
+                            take: Number(perPage),
+                            include: {
+                                Pt: true,
+                                Project: true,
+                                BarangPo: true,
+                                PembayaranPo: true,
+                                SuratJalanPo: true,
+                            },
+                            orderBy: {
+                                createdAt: 'desc'
+                            }
+                        });
+                    }
+                } else {
+                    if (search !== 'undefined') {
+                        result = await Po.findMany({
+                            where: {
+                                noPo: {
+                                    contains: search,
+                                    mode: 'insensitive'
+                                },
+                                ptId,
+                                projectId,
+                                status
+                            },
+                            skip: skipPage,
+                            take: Number(perPage),
+                            include: {
+                                Pt: true,
+                                Project: true,
+                                BarangPo: true,
+                                PembayaranPo: true,
+                                SuratJalanPo: true,
+                            },
+                            orderBy: {
+                                createdAt: 'desc'
+                            }
+                        });
+                    } else {
+                        result = await Po.findMany({
+                            where: {
+                                ptId,
+                                projectId,
+                                status
+                            },
+                            skip: skipPage,
+                            take: Number(perPage),
+                            include: {
+                                Pt: true,
+                                Project: true,
+                                BarangPo: true,
+                                PembayaranPo: true,
+                                SuratJalanPo: true,
+                            },
+                            orderBy: {
+                                createdAt: 'desc'
+                            }
+                        });
+                    }
                 }
             }
         }
+
+        let sj;
+        let newResult: any[] = [];
+        let statusSJ;
+
+        await Promise.all(result.map(async(item) => {
+            const lastStep = item.BarangPo.filter((e) => e.isMaster === true).reverse()[0];
+            const barangPo = item.BarangPo.filter(bp => bp.step === lastStep.step)
+            const totalBarangPo = barangPo.reduce((n, {qty}) => n + qty, 0);
+
+            sj = await SuratJalanPo.findMany({
+                where: {
+                    id: {
+                        in: item.SuratJalanPo.map((sjId) => sjId.id)
+                    }
+                },
+                include: {
+                    BarangSuratJalanPo: true
+                }
+            });
+
+            let totalBarangSJ = 0;
+            await Promise.all(sj.map(async(e) => {
+                const totalPerSJ = e.BarangSuratJalanPo.reduce((n, {qty}) => n + qty, 0);
+                totalBarangSJ += totalPerSJ;
+            }))
+
+            newResult.push({
+                ...item,
+                sj,
+                totalBarangPo,
+                totalBarangSJ,
+                statusSJ: totalBarangPo > totalBarangSJ ? 'Parsial' : 'Selesai' 
+            })
+        }));
+
+        debug(newResult, "NEW RESULTTT");
+
         return {
-            data: result,
+            data: newResult,
             document: {
                 currentPage: Number(page),
                 pageSize: Number(perPage),
