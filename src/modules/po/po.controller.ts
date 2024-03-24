@@ -139,6 +139,24 @@ export async function updatePembayaran(req: Request, res: Response) {
     }
 }
 
+export async function getPoList(req: Request, res: Response) {
+    try {
+        const poService = new PoService();
+        const result = await poService.getList(req.query as unknown as { search: string });
+        return res.status(200).send({
+            'status': 'success',
+            'code': 200,
+            'data': result
+        })
+    } catch (error) {
+        return res.status(500).send({
+            'status': 'error',
+            'code': 500,
+            'message': 'Internal server error.'
+        });
+    }
+}
+
 export async function getAllPo(req: Request, res: Response) {
     try {
         debug(req.query, ">>> getAllPo");

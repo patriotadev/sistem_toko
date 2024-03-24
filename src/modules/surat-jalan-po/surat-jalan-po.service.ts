@@ -64,55 +64,1395 @@ class SuratJalanPoService {
         }
     }
 
-    async findAll({search, page, perPage}: IParamsQuery) {
-        const skipPage = Number(page) * 10 - 10;
-        const totalCount = await SuratJalanPo.count();
-        const totalPages = Math.ceil(totalCount / perPage);
+    async getList({search}: {search: string}) {
         let result;
         if (search !== 'undefined') {
             result = await SuratJalanPo.findMany({
                 where: {
-                    OR: [
-                        {
-                            nomor:{
-                                contains: search,
-                                mode: 'insensitive'
-                            },
-                        },
-                        {
-                            Po: {
-                                noPo: {
-                                    contains: search,
-                                    mode: 'insensitive'
-                                },
-                            }
-                        }
-                    ]
-                },
-                skip: skipPage,
-                take: Number(perPage),
-                include: {
-                    Po: true,
-                    BarangSuratJalanPo: true,
-                    InvoicePo: true,
-                },
-                orderBy: {
-                    createdAt: 'desc'
+                    nomor: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
                 }
             });
         } else {
-            result = await SuratJalanPo.findMany({
-                skip: skipPage,
-                take: Number(perPage),
-                include: {
-                    Po: true,
-                    BarangSuratJalanPo: true,
-                    InvoicePo: true
-                },
-                orderBy: {
-                    createdAt: 'desc'
+            result = await SuratJalanPo.findMany();
+        }
+
+        return result;
+    }
+
+    async findAll({search, page, perPage, status, poId, ptId, projectId}: IParamsQuery) {
+        const skipPage = Number(page) * 10 - 10;
+        const totalCount = await SuratJalanPo.count();
+        const totalPages = Math.ceil(totalCount / perPage);
+        let result;
+
+        if (status === 'Sudah Invoice') {
+            if (poId !== 'undefined') {
+                if (ptId === 'all') {
+                    if (projectId === 'all') {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                    ],
+                                    InvoicePo: {
+                                        some: {}
+                                    },
+                                    poId
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    InvoicePo: {
+                                        some: {}
+                                    },
+                                    poId
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    } else {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                    ],
+                                    InvoicePo: {
+                                        some: {}
+                                    },
+                                    poId,
+                                    Po: {
+                                        projectId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    InvoicePo: {
+                                        some: {}
+                                    },
+                                    poId,
+                                    Po: {
+                                        projectId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    }
+                    // end pt
+                } else {
+                    if (projectId === 'all') {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                    ],
+                                    InvoicePo: {
+                                        some: {}
+                                    },
+                                    poId,
+                                    Po: {
+                                        ptId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    InvoicePo: {
+                                        some: {}
+                                    },
+                                    poId,
+                                    Po: {
+                                        ptId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    } else {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                    ],
+                                    InvoicePo: {
+                                        some: {}
+                                    },
+                                    poId,
+                                    Po: {
+                                        ptId,
+                                        projectId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    InvoicePo: {
+                                        some: {}
+                                    },
+                                    poId,
+                                    Po: {
+                                        ptId,
+                                        projectId
+                                    },
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    }
                 }
-            });
+            } else {
+                if (ptId === 'all') {
+                    if (projectId === 'all') {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                    ],
+                                    InvoicePo: {
+                                        some: {}
+                                    },
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    InvoicePo: {
+                                        some: {}
+                                    },
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    } else {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                    ],
+                                    InvoicePo: {
+                                        some: {}
+                                    },
+                                    Po: {
+                                        projectId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    InvoicePo: {
+                                        some: {}
+                                    },
+                                    Po: {
+                                        projectId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    }
+                    
+                } else {
+                    if (projectId === 'all') {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                    ],
+                                    InvoicePo: {
+                                        some: {}
+                                    },
+                                    Po: {
+                                        ptId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    InvoicePo: {
+                                        some: {}
+                                    },
+                                    Po: {
+                                        ptId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    } else {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                    ],
+                                    InvoicePo: {
+                                        some: {}
+                                    },
+                                    Po: {
+                                        ptId,
+                                        projectId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    InvoicePo: {
+                                        some: {}
+                                    },
+                                    Po: {
+                                        ptId,
+                                        projectId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+            // END SUDAH INVOICE
+        } else if (status === 'Belum Invoice') {
+            if (poId !== 'undefined') {
+                if (ptId === 'all') {
+                    if (projectId === 'all') {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                        {
+                                            Po: {
+                                                noPo: {
+                                                    contains: search,
+                                                    mode: 'insensitive'
+                                                },
+                                            }
+                                        },
+                                    ],
+                                    InvoicePo: {
+                                        none: {}
+                                    },
+                                    poId
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    InvoicePo: {
+                                        none: {}
+                                    },
+                                    poId
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    } else {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                        {
+                                            Po: {
+                                                noPo: {
+                                                    contains: search,
+                                                    mode: 'insensitive'
+                                                },
+                                            }
+                                        },
+                                    ],
+                                    InvoicePo: {
+                                        none: {}
+                                    },
+                                    poId,
+                                    Po: {
+                                        projectId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    InvoicePo: {
+                                        none: {}
+                                    },
+                                    poId,
+                                    Po: {
+                                        projectId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    }
+                    
+                } else {
+                    if (projectId === 'all') {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                        {
+                                            Po: {
+                                                noPo: {
+                                                    contains: search,
+                                                    mode: 'insensitive'
+                                                },
+                                            }
+                                        },
+                                    ],
+                                    InvoicePo: {
+                                        none: {}
+                                    },
+                                    poId,
+                                    Po: {
+                                        ptId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    InvoicePo: {
+                                        none: {}
+                                    },
+                                    poId,
+                                    Po: {
+                                        ptId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    } else {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                        {
+                                            Po: {
+                                                noPo: {
+                                                    contains: search,
+                                                    mode: 'insensitive'
+                                                },
+                                            }
+                                        },
+                                    ],
+                                    InvoicePo: {
+                                        none: {}
+                                    },
+                                    poId,
+                                    Po: {
+                                        ptId,
+                                        projectId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    InvoicePo: {
+                                        none: {}
+                                    },
+                                    poId,
+                                    Po: {
+                                        ptId,
+                                        projectId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    }
+                    
+                }
+            } else {
+                if (ptId === 'all') {
+                    if (projectId === 'all') {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                        {
+                                            Po: {
+                                                noPo: {
+                                                    contains: search,
+                                                    mode: 'insensitive'
+                                                },
+                                            }
+                                        },
+                                    ],
+                                    InvoicePo: {
+                                        none: {}
+                                    },
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    InvoicePo: {
+                                        none: {}
+                                    },
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    } else {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                        {
+                                            Po: {
+                                                noPo: {
+                                                    contains: search,
+                                                    mode: 'insensitive'
+                                                },
+                                            }
+                                        },
+                                    ],
+                                    InvoicePo: {
+                                        none: {}
+                                    },
+                                    Po: {
+                                        projectId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    InvoicePo: {
+                                        none: {}
+                                    },
+                                    Po: {
+                                        projectId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    }
+                } else {
+                    if (projectId === 'all') {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                        {
+                                            Po: {
+                                                noPo: {
+                                                    contains: search,
+                                                    mode: 'insensitive'
+                                                },
+                                            }
+                                        },
+                                    ],
+                                    InvoicePo: {
+                                        none: {}
+                                    },
+                                    Po: {
+                                        ptId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    InvoicePo: {
+                                        none: {}
+                                    },
+                                    Po: {
+                                        ptId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    } else {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                        {
+                                            Po: {
+                                                noPo: {
+                                                    contains: search,
+                                                    mode: 'insensitive'
+                                                },
+                                            }
+                                        },
+                                    ],
+                                    InvoicePo: {
+                                        none: {}
+                                    },
+                                    Po: {
+                                        ptId,
+                                        projectId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    InvoicePo: {
+                                        none: {}
+                                    },
+                                    Po: {
+                                        ptId,
+                                        projectId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    }
+                    
+                }
+                
+            }
+            // END BELUM INVOICE
+        } else {
+            if (poId !== 'undefined') {
+                if (ptId === 'all') {
+                    if (projectId === 'all') {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                    ],
+                                    poId
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    poId
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    } else {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                    ],
+                                    Po: {
+                                        projectId
+                                    },
+                                    poId
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    Po: {
+                                        projectId
+                                    },
+                                    poId
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    }
+                    
+                } else {
+                    if (projectId === 'all') {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                        {
+                                            Po: {
+                                                noPo: {
+                                                    contains: search,
+                                                    mode: 'insensitive'
+                                                },
+                                            }
+                                        },
+                                    ],
+                                    Po: {
+                                        ptId
+                                    },
+                                    poId
+
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    Po: {
+                                        ptId
+                                    },
+                                    poId
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    } else {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                        {
+                                            Po: {
+                                                noPo: {
+                                                    contains: search,
+                                                    mode: 'insensitive'
+                                                },
+                                            }
+                                        },
+                                    ],
+                                    Po: {
+                                        ptId,
+                                        projectId
+                                    },
+                                    poId
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    Po: {
+                                        ptId,
+                                        projectId
+                                    },
+                                    poId
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    }
+                }
+                //--
+            } else {
+                if (ptId === 'all') {
+                    if (projectId === 'all') {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                        {
+                                            Po: {
+                                                noPo: {
+                                                    contains: search,
+                                                    mode: 'insensitive'
+                                                },
+                                            }
+                                        },
+                                    ],
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    } else {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                        {
+                                            Po: {
+                                                noPo: {
+                                                    contains: search,
+                                                    mode: 'insensitive'
+                                                },
+                                            }
+                                        },
+                                    ],
+                                    Po: {
+                                        projectId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    Po: {
+                                        projectId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    }
+                    
+                } else {
+                    if (projectId === 'all') {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                        {
+                                            Po: {
+                                                noPo: {
+                                                    contains: search,
+                                                    mode: 'insensitive'
+                                                },
+                                            }
+                                        },
+                                    ],
+                                    Po: {
+                                        ptId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    Po: {
+                                        ptId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    } else {
+                        if (search !== 'undefined') {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    OR: [
+                                        {
+                                            nomor:{
+                                                contains: search,
+                                                mode: 'insensitive'
+                                            },
+                                        },
+                                        {
+                                            Po: {
+                                                noPo: {
+                                                    contains: search,
+                                                    mode: 'insensitive'
+                                                },
+                                            }
+                                        },
+                                    ],
+                                    Po: {
+                                        ptId,
+                                        projectId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true,
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        } else {
+                            result = await SuratJalanPo.findMany({
+                                where: {
+                                    Po: {
+                                        ptId,
+                                        projectId
+                                    }
+                                },
+                                skip: skipPage,
+                                take: Number(perPage),
+                                include: {
+                                    Po: true,
+                                    BarangSuratJalanPo: true,
+                                    InvoicePo: true
+                                },
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+            
         }
 
         let newResult: any[] = [];

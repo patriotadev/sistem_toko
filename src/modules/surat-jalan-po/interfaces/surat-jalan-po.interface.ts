@@ -5,6 +5,10 @@ export interface IParamsQuery {
     search: string | undefined
     page: number
     perPage: number,
+    status: string,
+    poId: string,
+    ptId: string,
+    projectId: string,
 }
 
 export interface IBarangSuratJalanPo {

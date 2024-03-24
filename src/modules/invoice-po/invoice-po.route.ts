@@ -3,6 +3,7 @@ import {
     createInvoicePo,
     deleteInvoicePoById,
     getAllInvoicePo,
+    getInvoiceList,
     getInvoicePoById,
     getInvoicePoByManyId,
     updateInvoicePoById,
@@ -12,6 +13,7 @@ const router = express.Router();
 
 router.get('/nota', getInvoicePoByManyId);
 router.get('/', getAllInvoicePo);
+router.get('/list', getInvoiceList);
 router.get('/:id', getInvoicePoById);
 router.post('/', createInvoicePo);
 router.put('/', updateInvoicePoById);

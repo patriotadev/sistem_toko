@@ -6,6 +6,11 @@ const InvoicePo = prisma.invoicePo;
 const InvoicePoList = prisma.invoicePoList;
 import moment from 'moment';
 const Toko = prisma.toko;
+const Pt = prisma.pt;
+const Project = prisma.project;
+const SuratJalanPo = prisma.suratJalanPo;
+const BarangSuratJalanPo = prisma.barangSuratJalanPo;
+const BarangPo = prisma.barangPo;
 const debug = require('debug')('hbpos-server:invoice-po-controller');
 
 class InvoicePoService {
@@ -80,52 +85,343 @@ class InvoicePoService {
         return result
    }
 
-    async findAll({search, page, perPage}: IParamsQuery) {
+   async getList(query: any) {
+    const {ptId, projectId} = query;
+    const result = await InvoicePo.findMany({
+        where: {
+            Po: {
+                ptId,
+                projectId
+            }
+        }
+    });
+    return result;
+   }
+
+    async findAll({search, page, perPage, ptId, projectId, suratJalanPoId}: IParamsQuery) {
         const skipPage = Number(page) * 10 - 10;
         const totalCount = await InvoicePo.count();
         const totalPages = Math.ceil(totalCount / perPage);
         let result;
-        if (search !== 'undefined') {
-            result = await InvoicePo.findMany({
-                where: {
-                    nomor: {
-                        contains: search,
-                        mode: 'insensitive'
-                    },
-                },
-                skip: skipPage,
-                take: Number(perPage),
-                include: {
-                    InvoicePoList:  true,
-                    SuratJalanPo: true,
-                    TandaTerimaNotaList: true,
-                    Po: true
-                },
-                orderBy: {
-                    createdAt: 'desc'
+        if (suratJalanPoId !== 'undefined') {
+            if (ptId === 'all') {
+                if (search !== 'undefined') {
+                    result = await InvoicePo.findMany({
+                        where: {
+                            nomor: {
+                                contains: search,
+                                mode: 'insensitive'
+                            },
+                            suratJalanPoId
+                        },
+                        skip: skipPage,
+                        take: Number(perPage),
+                        include: {
+                            InvoicePoList:  true,
+                            SuratJalanPo: true,
+                            TandaTerimaNotaList: true,
+                            Po: true,
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
+                        }
+                    });
+                } else {
+                    result = await InvoicePo.findMany({
+                        where: {
+                            suratJalanPoId
+                        },
+                        skip: skipPage,
+                        take: Number(perPage),
+                        include: {
+                            InvoicePoList: true,
+                            SuratJalanPo: true,
+                            TandaTerimaNotaList: true,
+                            Po: true
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
+                        }
+                    });
                 }
-            });
+            } else {
+                if (projectId === 'all') {
+                    if (search !== 'undefined') {
+                        result = await InvoicePo.findMany({
+                            where: {
+                                nomor: {
+                                    contains: search,
+                                    mode: 'insensitive'
+                                },
+                                Po: {
+                                    ptId
+                                },
+                                suratJalanPoId
+                            },
+                            skip: skipPage,
+                            take: Number(perPage),
+                            include: {
+                                InvoicePoList:  true,
+                                SuratJalanPo: true,
+                                TandaTerimaNotaList: true,
+                                Po: true,
+                            },
+                            orderBy: {
+                                createdAt: 'desc'
+                            }
+                        });
+                    } else {
+                        result = await InvoicePo.findMany({
+                            where: {
+                                Po: {
+                                    ptId
+                                },
+                                suratJalanPoId
+                            },
+                            skip: skipPage,
+                            take: Number(perPage),
+                            include: {
+                                InvoicePoList: true,
+                                SuratJalanPo: true,
+                                TandaTerimaNotaList: true,
+                                Po: true
+                            },
+                            orderBy: {
+                                createdAt: 'desc'
+                            }
+                        });
+                    }
+                } else {
+                    if (search !== 'undefined') {
+                        result = await InvoicePo.findMany({
+                            where: {
+                                nomor: {
+                                    contains: search,
+                                    mode: 'insensitive'
+                                },
+                                Po: {
+                                    ptId,
+                                    projectId
+                                },
+                                suratJalanPoId
+                            },
+                            skip: skipPage,
+                            take: Number(perPage),
+                            include: {
+                                InvoicePoList:  true,
+                                SuratJalanPo: true,
+                                TandaTerimaNotaList: true,
+                                Po: true,
+                            },
+                            orderBy: {
+                                createdAt: 'desc'
+                            }
+                        });
+                    } else {
+                        result = await InvoicePo.findMany({
+                            where: {
+                                Po: {
+                                    ptId,
+                                    projectId
+                                },
+                                suratJalanPoId
+                            },
+                            skip: skipPage,
+                            take: Number(perPage),
+                            include: {
+                                InvoicePoList: true,
+                                SuratJalanPo: true,
+                                TandaTerimaNotaList: true,
+                                Po: true
+                            },
+                            orderBy: {
+                                createdAt: 'desc'
+                            }
+                        });
+                    }
+                }
+            }
+            // 
         } else {
-            result = await InvoicePo.findMany({
-                skip: skipPage,
-                take: Number(perPage),
-                include: {
-                    InvoicePoList: true,
-                    SuratJalanPo: true,
-                    TandaTerimaNotaList: true,
-                    Po: true
-                },
-                orderBy: {
-                    createdAt: 'desc'
+            if (ptId === 'all') {
+                if (search !== 'undefined') {
+                    result = await InvoicePo.findMany({
+                        where: {
+                            nomor: {
+                                contains: search,
+                                mode: 'insensitive'
+                            },
+                        },
+                        skip: skipPage,
+                        take: Number(perPage),
+                        include: {
+                            InvoicePoList:  true,
+                            SuratJalanPo: true,
+                            TandaTerimaNotaList: true,
+                            Po: true,
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
+                        }
+                    });
+                } else {
+                    result = await InvoicePo.findMany({
+                        skip: skipPage,
+                        take: Number(perPage),
+                        include: {
+                            InvoicePoList: true,
+                            SuratJalanPo: true,
+                            TandaTerimaNotaList: true,
+                            Po: true
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
+                        }
+                    });
+                }
+            } else {
+                if (projectId === 'all') {
+                    if (search !== 'undefined') {
+                        result = await InvoicePo.findMany({
+                            where: {
+                                nomor: {
+                                    contains: search,
+                                    mode: 'insensitive'
+                                },
+                                Po: {
+                                    ptId
+                                }
+                            },
+                            skip: skipPage,
+                            take: Number(perPage),
+                            include: {
+                                InvoicePoList:  true,
+                                SuratJalanPo: true,
+                                TandaTerimaNotaList: true,
+                                Po: true,
+                            },
+                            orderBy: {
+                                createdAt: 'desc'
+                            }
+                        });
+                    } else {
+                        result = await InvoicePo.findMany({
+                            where: {
+                                Po: {
+                                    ptId
+                                }
+                            },
+                            skip: skipPage,
+                            take: Number(perPage),
+                            include: {
+                                InvoicePoList: true,
+                                SuratJalanPo: true,
+                                TandaTerimaNotaList: true,
+                                Po: true
+                            },
+                            orderBy: {
+                                createdAt: 'desc'
+                            }
+                        });
+                    }
+                } else {
+                    if (search !== 'undefined') {
+                        result = await InvoicePo.findMany({
+                            where: {
+                                nomor: {
+                                    contains: search,
+                                    mode: 'insensitive'
+                                },
+                                Po: {
+                                    ptId,
+                                    projectId
+                                }
+                            },
+                            skip: skipPage,
+                            take: Number(perPage),
+                            include: {
+                                InvoicePoList:  true,
+                                SuratJalanPo: true,
+                                TandaTerimaNotaList: true,
+                                Po: true,
+                            },
+                            orderBy: {
+                                createdAt: 'desc'
+                            }
+                        });
+                    } else {
+                        result = await InvoicePo.findMany({
+                            where: {
+                                Po: {
+                                    ptId,
+                                    projectId
+                                }
+                            },
+                            skip: skipPage,
+                            take: Number(perPage),
+                            include: {
+                                InvoicePoList: true,
+                                SuratJalanPo: true,
+                                TandaTerimaNotaList: true,
+                                Po: true
+                            },
+                            orderBy: {
+                                createdAt: 'desc'
+                            }
+                        });
+                    }
+                }
+            }
+        }
+        
+
+        const newResult: any[] = [];
+        await Promise.all(result.map(async(item) => {
+            const ptData = await Pt.findUnique({
+                where: {
+                    id: item.Po?.ptId
                 }
             });
-        }
+            const projectData = await Project.findUnique({
+                where: {
+                    id: item.Po?.projectId
+                }
+            });
+            const barangSjData = await BarangSuratJalanPo.findMany({
+                where: {
+                    suratJalanPoId: item.SuratJalanPo.id
+                },
+            });
+            const bsjData: any[] = [];
+            let totalJumlah = 0;
+            await Promise.all(barangSjData.map(async(bsj) => {
+                const barangPoData = await BarangPo.findFirst({
+                    where: {
+                        poId: item.Po.id,
+                        kode: bsj.kode
+                    }
+                });
+                bsjData.push({
+                    ...bsj,
+                    harga: barangPoData?.harga
+                });
+                if (barangPoData) {
+                    totalJumlah += bsj.qty * barangPoData?.harga
+                }
+            }))
+            newResult.push({
+                ...item,
+                Pt: ptData,
+                Project: projectData,
+                BarangSj: bsjData,
+                totalJumlah
+            })
+        }));
 
-        // NEW RESULT
-        // PT NAME
-        // BARANG SURAT JALAN PO
+        debug(newResult, ">>>> NEW RESULTTT");
+
         return {
-            data: result,
+            data: newResult,
             document: {
                 currentPage: Number(page),
                 pageSize: Number(perPage),
@@ -154,7 +450,9 @@ class InvoicePoService {
                 }
             },
             include: {
-                InvoicePoList: true
+                InvoicePoList: true,
+                SuratJalanPo: true,
+                Po: true
             }
         });
         console.log("po list from invoice ==>", result);

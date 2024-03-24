@@ -36,6 +36,7 @@ export async function createInvoicePo(req: Request, res: Response) {
 
 export async function getAllInvoicePo(req: Request, res: Response) {
     try {
+        debug(req.query, ">>>> req.query inv po")
         const invoicePoService = new InvoicePoService();
         const result = await invoicePoService.findAll(req.query as unknown as IParamsQuery);
         return res.status(200).send({
@@ -64,6 +65,24 @@ export async function getInvoicePoByManyId(req: Request, res: Response) {
             'code': 200,
             'data': result
         });
+    } catch (error) {
+        return res.status(500).send({
+            'status': 'error',
+            'code': 500,
+            'message': 'Internal server error.'
+        });
+    }
+}
+
+export async function getInvoiceList(req: Request, res: Response) {
+    try {
+        const invoicePoService = new InvoicePoService();
+        const result = await invoicePoService.getList(req.query);
+        return res.status(200).send({
+            'status': 'success',
+            'code': 200,
+            'data': result
+        })
     } catch (error) {
         return res.status(500).send({
             'status': 'error',

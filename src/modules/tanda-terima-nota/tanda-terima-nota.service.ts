@@ -11,10 +11,14 @@ const Toko = prisma.toko;
 const InvoicePoList = prisma.invoicePoList;
 const InvoicePo = prisma.invoicePo;
 const Po = prisma.po;
+const Pt = prisma.pt
+const BarangSuratJalanPo = prisma.barangSuratJalanPo;
+const BarangPo = prisma.barangPo;
+const SuratJalanPo = prisma.suratJalanPo
 
 class TandaTerimaNotaService {
     async create(payload: TandaTerimaNotaDTO) {
-        const { tanggal, jatuhTempo, createdBy, tokoId } = payload;
+        const { tanggal, ptId, projectId, jatuhTempo, createdBy, tokoId } = payload;
         const generateCode = await this.generateCode(tokoId, new Date());
         if (generateCode) {
             const result = await TandaTerimaNota.create({
@@ -23,6 +27,8 @@ class TandaTerimaNotaService {
                     jatuhTempo: Number(jatuhTempo),
                     status: 'Belum Tanda Terima',
                     tanggal,
+                    ptId,
+                    projectId,
                     createdBy
                 }
             });
@@ -106,42 +112,184 @@ class TandaTerimaNotaService {
         return result;
    }
 
-    async findAll({search, page, perPage}: IParamsQuery) {
+    async findAll({search, page, perPage, ptId, projectId}: IParamsQuery) {
         const skipPage = Number(page) * 10 - 10;
         const totalCount = await TandaTerimaNota.count();
         const totalPages = Math.ceil(totalCount / perPage);
         let result;
-        if (search !== 'undefined') {
-            result = await TandaTerimaNota.findMany({
-                where: {
-                    nomor: {
-                        contains: search,
-                        mode: 'insensitive'
+        if (ptId === 'all') {
+            if (search !== 'undefined') {
+                result = await TandaTerimaNota.findMany({
+                    where: {
+                        nomor: {
+                            contains: search,
+                            mode: 'insensitive'
+                        },
                     },
-                },
-                skip: skipPage,
-                take: Number(perPage),
-                include: {
-                    TandaTerimaNotaList:  true
-                },
-                orderBy: {
-                    createdAt: 'desc'
-                }
-            });
+                    skip: skipPage,
+                    take: Number(perPage),
+                    include: {
+                        TandaTerimaNotaList:  true,
+                        Pt: true,
+                        Project: true
+                    },
+                    orderBy: {
+                        createdAt: 'desc'
+                    }
+                });
+            } else {
+                result = await TandaTerimaNota.findMany({
+                    skip: skipPage,
+                    take: Number(perPage),
+                    include: {
+                        TandaTerimaNotaList: true,
+                        Pt: true,
+                        Project: true
+                    },
+                    orderBy: {
+                        createdAt: 'desc'
+                    }
+                });
+            }
         } else {
-            result = await TandaTerimaNota.findMany({
-                skip: skipPage,
-                take: Number(perPage),
-                include: {
-                    TandaTerimaNotaList: true
+            if (projectId === 'all') {
+                if (search !== 'undefined') {
+                    result = await TandaTerimaNota.findMany({
+                        where: {
+                            nomor: {
+                                contains: search,
+                                mode: 'insensitive'
+                            },
+                            ptId
+                        },
+                        skip: skipPage,
+                        take: Number(perPage),
+                        include: {
+                            TandaTerimaNotaList:  true,
+                            Pt: true,
+                            Project: true
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
+                        }
+                    });
+                } else {
+                    result = await TandaTerimaNota.findMany({
+                        where: {
+                            ptId
+                        },
+                        skip: skipPage,
+                        take: Number(perPage),
+                        include: {
+                            TandaTerimaNotaList: true,
+                            Pt: true,
+                            Project: true
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
+                        }
+                    });
+                }
+            } else {
+                if (search !== 'undefined') {
+                    result = await TandaTerimaNota.findMany({
+                        where: {
+                            nomor: {
+                                contains: search,
+                                mode: 'insensitive'
+                            },
+                            ptId,
+                            projectId
+                        },
+                        skip: skipPage,
+                        take: Number(perPage),
+                        include: {
+                            TandaTerimaNotaList:  true,
+                            Pt: true,
+                            Project: true
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
+                        }
+                    });
+                } else {
+                    result = await TandaTerimaNota.findMany({
+                        where: {
+                            ptId,
+                            projectId
+                        },
+                        skip: skipPage,
+                        take: Number(perPage),
+                        include: {
+                            TandaTerimaNotaList: true,
+                            Pt: true,
+                            Project: true
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
+                        }
+                    });
+                }
+            }
+        }
+
+        const newResult: any[] = [];
+        await Promise.all(result.map(async (item) => {
+            const notaList = await TandaTerimaNotaList.findMany({
+                where: {
+                    tandaTerimaNotaId: {
+                        in: item.TandaTerimaNotaList.map((item) => item.tandaTerimaNotaId)
+                    }
                 },
-                orderBy: {
-                    createdAt: 'desc'
+                include: {
+                    InvoicePo: true,
                 }
             });
-        }
+
+            const newNotaList: any[] = [];
+            await Promise.all(notaList.map(async (nl) => {
+                const invoiceData = await InvoicePo.findUnique({
+                    where: {
+                        id: nl.invoicePoId
+                    },
+                    include: {
+                        SuratJalanPo: true
+                    }
+                });
+
+                const barangSjData = await BarangSuratJalanPo.findMany({
+                    where: {
+                        suratJalanPoId: invoiceData?.SuratJalanPo.id
+                    },
+                });
+                let totalJumlah = 0;
+                await Promise.all(barangSjData.map(async(bsj) => {
+                    const barangPoData = await BarangPo.findFirst({
+                        where: {
+                            poId: nl.InvoicePo.poId,
+                            kode: bsj.kode
+                        }
+                    });
+                    if (barangPoData) {
+                        totalJumlah += bsj.qty * barangPoData?.harga
+                    }
+                }))
+                newNotaList.push({
+                    ...nl,
+                    totalJumlah
+                })
+            }))
+        
+            newResult.push({
+                ...item,
+                Invoice: newNotaList,
+                totalJumlahInvoice: newNotaList.reduce((n, {totalJumlah}) => n + totalJumlah, 0)
+            });
+
+        }));
+
         return {
-            data: result,
+            data: newResult,
             document: {
                 currentPage: Number(page),
                 pageSize: Number(perPage),

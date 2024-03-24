@@ -1,9 +1,10 @@
 import express from 'express';
-import { createPo, deletePoById, getAllPo, getPoById, getPoByManyId, updatePembayaran, updatePoById, updateStatusPoById } from './po.controller';
+import { createPo, deletePoById, getAllPo, getPoById, getPoByManyId, getPoList, updatePembayaran, updatePoById, updateStatusPoById } from './po.controller';
 const router = express.Router();
 
 router.get('/invoice', getPoByManyId);
 router.get('/', getAllPo);
+router.get('/list', getPoList);
 router.get('/:id', getPoById);
 router.put('/pembayaran', updatePembayaran);
 router.post('/', createPo);

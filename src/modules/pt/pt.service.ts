@@ -17,6 +17,15 @@ class PtService {
         return result;
     }
 
+    async getList() {
+        const result = await Pt.findMany({
+            include: {
+                Project: true
+            }
+        });
+        return result;
+    }
+
     async findAll({search, page, perPage}: IParamsQuery) {
         const skipPage = Number(page) * 10 - 10;
         const totalCount = await Pt.count();

@@ -81,6 +81,7 @@ export async function createSuratJalanPo(req: Request, res: Response) {
 
 export async function getAllSuratJalanPo(req: Request, res: Response) {
     try {
+        debug(req.query, ">>> req.queryy");
         const suratJalanPoService = new SuratJalanPoService();
         console.log("queryy", req.query);
         const result = await suratJalanPoService.findAll(req.query as unknown as IParamsQuery);
@@ -98,6 +99,26 @@ export async function getAllSuratJalanPo(req: Request, res: Response) {
         });
     }
 }
+
+export async function getSuratJalanPoList(req: Request, res: Response) {
+    try {
+        const suratJalanPoService = new SuratJalanPoService();
+        console.log("queryy", req.query.search);
+        const result = await suratJalanPoService.getList(req.query as unknown as { search: string });
+        return res.status(200).send({
+            'status': 'success',
+            'code': 200,
+            'data': result,
+        });
+    } catch (error) {
+        return res.status(500).send({
+            'status': 'error',
+            'code': 500,
+            'message': 'Internal server error.'
+        });
+    }
+}
+
 
 export async function getSuratJalanPoById(req: Request, res: Response) {
     try {

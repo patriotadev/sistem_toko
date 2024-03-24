@@ -20,6 +20,25 @@ export async function createPt(req: Request, res: Response) {
     }
 }
 
+export async function getList(req: Request, res: Response) {
+    try {
+        const ptService = new PtService();
+        const result = await ptService.getList();
+        console.log(result);
+        return res.status(200).send({
+            'status': 'success',
+            'code': 200,
+            'data': result,
+        });
+    } catch (error) {
+        return res.status(500).send({
+            'status': 'error',
+            'code': 500,
+            'message': 'Internal server error.'
+        });
+    }
+}
+
 export async function getAllPt(req: Request, res: Response) {
     try {
         const ptService = new PtService();

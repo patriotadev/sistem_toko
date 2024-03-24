@@ -38,6 +38,7 @@ export async function createTandaTerimaNota(req: Request, res: Response) {
 
 export async function getAllTandaTerimaNota(req: Request, res: Response) {
     try {
+        debug(req.query, ">>> req.queryy")
         const tandaTerimaNotaService = new TandaTerimaNotaService();
         const result = await tandaTerimaNotaService.findAll(req.query as unknown as IParamsQuery);
         return res.status(200).send({

@@ -4,5 +4,7 @@ export interface TandaTerimaNotaDTO {
     status?: string
     jatuhTempo: number
     createdBy: string
+    ptId: string
+    projectId: string
     updatedBy?: string
 }

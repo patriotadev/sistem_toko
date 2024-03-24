@@ -68,6 +68,24 @@ class PoService {
         return result;
     }
 
+    async getList({search}: {search: string}) {
+        let result;
+        if (search !== 'undefined') {
+            result = await Po.findMany({
+                where: {
+                    noPo: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
+                }
+            });
+        } else {
+            result = await Po.findMany();
+        }
+
+        return result;
+    }
+
     async findAll({search, page, perPage, ptId, projectId, status}: IParamsQuery) {
         const skipPage = Number(page) * 10 - 10;
         const totalCount = await Po.count();
