@@ -4,6 +4,7 @@ import { IParamsQuery } from './interfaces/po.interface';
 import BarangPoService from '../barang-po/barang-po.service';
 import BarangPoDTO from '../barang-po/dto/barang-po.dto';
 import StokService from '../stok/stok.service';
+import { thousandLimiter } from '../../helpers/thousand-limiter';
 const debug = require('debug')('hbpos-server:po-controller');
 
 export async function createPo(req: Request, res: Response) {
@@ -56,6 +57,7 @@ export async function createPo(req: Request, res: Response) {
         const pembayaranPayload = {
             metode: req.body.pembayaran.metodePembayaran,
             jumlahBayar: req.body.pembayaran.jumlahBayar,
+            nominal: 0,
             totalPembayaran: req.body.pembayaran.totalPembayaran,
             poId: poResult.id,
             isApprove: req.body.pembayaran.isApprove,
@@ -64,7 +66,15 @@ export async function createPo(req: Request, res: Response) {
             createdBy: req.body.pembayaran.createdBy,
             createdAt: req.body.pembayaran.createdAt
         };
-        await poService.createPembayaran(pembayaranPayload);
+        const pembayaranResult = await poService.createPembayaran(pembayaranPayload);
+        const riwayatPembayaranPayload = {
+            poId: poResult.id,
+            pembayaranPoId: pembayaranResult.id,
+            createdBy: req.body.pembayaran.createdBy,
+            createdAt: req.body.pembayaran.createdAt,
+            description: `PO baru ditambahkan dengan total pembayaran ${thousandLimiter(req.body.pembayaran.totalPembayaran, 'Rp')}`
+        }
+        await poService.createRiwayatPembayaran(riwayatPembayaranPayload);
         return res.status(201).send({
             'status': 'success',
             'code': 201,
@@ -123,7 +133,31 @@ export async function updateMaster(req: Request, res: Response) {
 export async function updatePembayaran(req: Request, res: Response) {
     try {
         const poService = new PoService();
-        await poService.updatePembayaran(req.body);
+        const pembayaranResult = await poService.updatePembayaran(req.body);
+        let description: string = '';
+        debug(req.body, ">>> req.body updatePembayaran")
+        if (req.body.nominalBayar && req.body.editJumlahBayar) {
+            description = `Data sisa pembayaran diubah dengan nominal ${thousandLimiter(req.body.totalPembayaran - req.body.jumlahBayar + Number(req.body.nominalBayar), 'Rp')}, dan pembayaran ditambahkan dengan nominal ${thousandLimiter(req.body.nominalBayar, 'Rp')}`
+        }
+        else if (req.body.nominalBayar && !req.body.editJumlahBayar) {
+            description = `Pembayaran ditambahkan dengan nominal ${thousandLimiter(req.body.nominalBayar, 'Rp')}`
+        } else {
+            description = `Data sisa pembayaran diubah dengan nominal ${thousandLimiter(req.body.totalPembayaran - req.body.jumlahBayar, 'Rp')}`
+        }
+
+        if (Number(pembayaranResult.totalPembayaran) === Number(pembayaranResult.jumlahBayar)) {
+            description.concat(', status pembayaran SUDAH LUNAS')
+        }
+
+        const riwayatPembayaranPayload = {
+            poId: req.body.poId,
+            pembayaranPoId: req.body.id,
+            createdBy: req.body.updatedBy,
+            createdAt: req.body.updatedAt,
+            description,
+        };
+
+        await poService.createRiwayatPembayaran(riwayatPembayaranPayload)
         return res.status(200).send({
             'status': 'success',
             'code': 200,
@@ -143,6 +177,24 @@ export async function getPoList(req: Request, res: Response) {
     try {
         const poService = new PoService();
         const result = await poService.getList(req.query as unknown as { search: string });
+        return res.status(200).send({
+            'status': 'success',
+            'code': 200,
+            'data': result
+        })
+    } catch (error) {
+        return res.status(500).send({
+            'status': 'error',
+            'code': 500,
+            'message': 'Internal server error.'
+        });
+    }
+}
+
+export async function getRiwayatPembayaran(req: Request, res: Response) {
+    try {
+        const poService = new PoService();
+        const result = await poService.findRiwayatPembayaran(req.query as unknown as { poId: string });
         return res.status(200).send({
             'status': 'success',
             'code': 200,

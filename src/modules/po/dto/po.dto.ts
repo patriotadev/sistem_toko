@@ -15,6 +15,7 @@ export interface PembayaranPoDTO {
     poId: string
     totalPembayaran: number
     jumlahBayar: number
+    nominal: number
     metode: string
     isApprove: boolean
     approvedAt: Date

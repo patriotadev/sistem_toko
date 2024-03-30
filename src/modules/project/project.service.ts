@@ -17,6 +17,28 @@ class ProjectService {
         return result;
     }
 
+    async getList(payload: { ptId: string | undefined }) {
+        const { ptId } = payload;
+        let result;
+        if (ptId) {
+            result = await Project.findMany({
+                where: {
+                    ptId
+                },
+                include: {
+                    Po: true
+                }
+            });
+        } else {
+            result = await Project.findMany({
+                include: {
+                    Po: true
+                }
+            });
+        }
+        return result;
+    }
+
     async findAll({ search, page, perPage, ptId }: IParamsQuery) {
         const skipPage = Number(page) * 10 - 10;
         const totalCount = await Project.count();

@@ -219,15 +219,11 @@ class StokService {
                                         mode: 'insensitive'
                                     },
                                 },
-                                {
-                                    isPo: true,
-                                },
-                                {
-                                    jumlahPo: {
-                                        gt: 0
-                                    }
-                                }
                             ],
+                            isPo: true,
+                            jumlahPo: {
+                                gt: 0
+                            }
                         },
                         skip: skipPage,
                         take: Number(perPage),
@@ -251,7 +247,11 @@ class StokService {
                                         gt: 0
                                     }
                                 }
-                            ]
+                            ],
+                            isPo: true,
+                            jumlahPo: {
+                                gt: 0
+                            }
                         },
                         take: Number(perPage),
                         include: {
@@ -279,15 +279,8 @@ class StokService {
                                         mode: 'insensitive'
                                     },
                                 },
-                                {
-                                    isPo: true,
-                                },
-                                {
-                                    jumlahPo: {
-                                        gt: 0
-                                    }
-                                }
                             ],
+                            tokoId,
                             isPo: true,
                             jumlahPo: {
                                 gt: 0
@@ -314,7 +307,12 @@ class StokService {
                                         gt: 0
                                     }
                                 }
-                            ]
+                            ],
+                            tokoId,
+                            isPo: true,
+                            jumlahPo: {
+                                gt: 0
+                            }
                         },
                         skip: skipPage,
                         take: Number(perPage),

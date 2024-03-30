@@ -5,6 +5,7 @@ const Po = prisma.po;
 const PembayaranPo = prisma.pembayaranPo;
 const BarangSuratJalanPo = prisma.barangSuratJalanPo;
 const SuratJalanPo = prisma.suratJalanPo;
+const RiwayatPembayaranPo = prisma.riwayatPembayaranPo;
 const debug = require('debug')('hbpos-server:po-service');
 
 class PoService {
@@ -32,9 +33,31 @@ class PoService {
     }
 
     async createPembayaran(payload: PembayaranPoDTO) {
-        const result = PembayaranPo.create({data: {
+        const result = await PembayaranPo.create({data: {
             ...payload
         }});
+        return result;
+    }
+    
+    async createRiwayatPembayaran(payload: any) {
+        const result = await RiwayatPembayaranPo.create({
+            data: {
+                ...payload
+            }
+        });
+        return result;
+    }
+
+    async findRiwayatPembayaran(payload: {poId: string}) {
+        const { poId } = payload;
+        const result = await RiwayatPembayaranPo.findMany({
+            where: {
+                poId
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
         return result;
     }
 
@@ -474,7 +497,12 @@ class PoService {
     }
 
     async deleteOneById(id: string) {
-        const pembayaranPo = await PembayaranPo.deleteMany({
+        await RiwayatPembayaranPo.deleteMany({
+            where: {
+                poId: id
+            }
+        });
+        await PembayaranPo.deleteMany({
             where: {
                 poId: id
             }

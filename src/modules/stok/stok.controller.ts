@@ -24,6 +24,7 @@ export async function createStok(req: Request, res: Response) {
 
 export async function getAllStok(req: Request, res: Response) {
     try {
+        debug(req.query, ">>> REQ.QUERY");
         const stokService = new StokService();
         const result = await stokService.findAll(req.query as unknown as IParamsQuery);
         res.status(200).send({

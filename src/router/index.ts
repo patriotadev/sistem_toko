@@ -15,6 +15,7 @@ import UserRouter from '../modules/user/user.route';
 import PenjualanRouter from '../modules/penjualan/penjualan.route';
 import InvoicePenjualanRouter from '../modules/invoice-penjualan/invoice-penjualan.route';
 import NotaPenjualanRouter from '../modules/nota-penjualan/nota-penjualan.route';
+import LaporanPoRouter from '../modules/laporan-po/laporan-po.route';
 
 const router = express.Router();
 
@@ -38,6 +39,7 @@ router.use('/api/user', UserRouter);
 router.use('/api/penjualan', PenjualanRouter);
 router.use('/api/invoice-penjualan', InvoicePenjualanRouter);
 router.use('/api/nota-penjualan', NotaPenjualanRouter);
+router.use('/api/laporan-po', LaporanPoRouter);
 
 router.use((req: Request, res: Response) => {
     res.status(400).send('Invalid route.');
