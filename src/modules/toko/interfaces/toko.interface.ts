@@ -9,5 +9,8 @@ export interface IParamsQuery {
 export interface IToko {
     id: string
     description: string
+    contact: string
+    address: string
+    city: string
     User: IPengguna[]
 }

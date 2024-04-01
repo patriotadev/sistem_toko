@@ -10,6 +10,7 @@ const Toko = prisma.toko;
 const Menu = prisma.menu;
 const RoleMenu = prisma.roleMenu;
 const SubMenu = prisma.subMenu;
+const PaymentAccount = prisma.paymentAccount;
 
 export default class AuthService {
 
@@ -47,6 +48,11 @@ export default class AuthService {
             }
         });
         return toko;
+    }
+
+    async getPaymentAccount() {
+        const paymentAccount = await PaymentAccount.findMany();
+        return paymentAccount;
     }
 
     async getUserRoleMenu(payload: AuthDTO) {

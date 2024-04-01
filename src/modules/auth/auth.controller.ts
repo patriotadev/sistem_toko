@@ -47,6 +47,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
             const refreshToken = authService.generateRefreshToken(result.user);
             const userRole = await authService.getUserRole(result.user);
             const userToko = await authService.getUserToko(result.user);
+            const paymentAccount = await authService.getPaymentAccount();
             const userRoleMenu = await authService.getUserRoleMenu(result.user);
             await authService.postRefreshTokenToList(refreshToken, result.user);
             console.log("Access Token==>", accessToken)
@@ -59,7 +60,8 @@ export async function login(req: Request, res: Response, next: NextFunction) {
                     refreshToken,
                     role: userRole,      
                     toko: userToko, 
-                    userRoleMenu: userRoleMenu                                                                          
+                    userRoleMenu: userRoleMenu,
+                    paymentAccount                                                                        
                 }
             });
         }

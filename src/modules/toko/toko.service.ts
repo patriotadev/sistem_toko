@@ -6,23 +6,29 @@ const Toko = new PrismaClient().toko;
 class TokoService {
 
     async createToko(payload: TokoDTO) {
-        const { description } = payload;
+        const { description, contact, address, city } = payload;
         const result = await Toko.create({
             data: {
-                description
+                description,
+                contact,
+                address,
+                city
             }
         });
         return result;
     }
 
     async updateToko(id: string, payload: TokoDTO) {
-        const { description } = payload;
+        const { description, contact, address, city } = payload;
         const result = Toko.update({
             where: {
                 id
             },
             data: {
-                description
+                description,
+                contact,
+                address,
+                city
             }
         });
         return result;

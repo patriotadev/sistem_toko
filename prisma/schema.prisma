@@ -14,9 +14,19 @@ model Toko {
   id          String       @id @default(cuid())
   description String
   User        User[]
+  contact     String       @default("")
+  address     String       @default("")
+  city        String       @default("")
   StokBarang  StokBarang[]
   Penjualan   Penjualan[]
   StokPo      StokPo[]
+}
+
+model PaymentAccount {
+  id            String @id @default(cuid())
+  bankName      String
+  accountNumber String
+  accountName   String
 }
 
 model Role {

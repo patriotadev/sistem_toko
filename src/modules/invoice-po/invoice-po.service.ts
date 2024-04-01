@@ -93,6 +93,9 @@ class InvoicePoService {
                 ptId,
                 projectId
             }
+        },
+        include: {
+            TandaTerimaNotaList: true
         }
     });
     return result;
