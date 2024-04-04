@@ -272,7 +272,7 @@ class TandaTerimaNotaService {
                         }
                     });
                     if (barangPoData) {
-                        totalJumlah += bsj.qty * barangPoData?.harga
+                        totalJumlah += bsj.qty * barangPoData?.harga - barangPoData?.discount
                     }
                 }))
                 newNotaList.push({

@@ -94,8 +94,8 @@ class LaporanPoService {
                                 ...bsjd,
                                 harga: barangPoData?.harga,
                                 qtyInit: barangPoData?.qty,
-                                totalHargaInit: Number(barangPoData?.qty) * Number(barangPoData?.harga),
-                                totalHarga: bsjd.qty * Number(barangPoData?.harga)
+                                totalHargaInit: Number(barangPoData?.qty) * Number(barangPoData?.harga) - Number(barangPoData?.discount),
+                                totalHarga: bsjd.qty * Number(barangPoData?.harga)  - Number(barangPoData?.discount)
                             });
                         }));
 

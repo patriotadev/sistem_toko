@@ -410,7 +410,7 @@ class InvoicePoService {
                     harga: barangPoData?.harga
                 });
                 if (barangPoData) {
-                    totalJumlah += bsj.qty * barangPoData?.harga
+                    totalJumlah += bsj.qty * barangPoData?.harga - barangPoData?.discount
                 }
             }))
             newResult.push({
