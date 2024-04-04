@@ -9,72 +9,83 @@ const debug = require('debug')('hbpos-server:po-controller');
 
 export async function createPo(req: Request, res: Response) {
     try {
-        debug("=== createPo req.body  ===");
-        debug(req.body);
         const poService = new PoService();
         const barangPoService = new BarangPoService();
         const stokService = new StokService();
-        const poResult = await poService.create(req.body.po);
+        const poResult = await poService.create(req.body.po).catch((e) => {
+            return e;
+        });
+        if (poResult.prismaError) {
+            return res.status(400).send({
+                'status': 'error',
+                'code': 400,
+                'message': 'Error while process data.',
+                'error': poResult
+            });
+        }
+
         if (req.body.stokPo.length > 0) {
             await stokService.createStokPo(req.body.stokPo);
         }
         const barangPoMasterPayload: Omit<BarangPoDTO, "id">[] = [];
-        req.body.barangPo.map(async (item: Omit<BarangPoDTO, "id">) => {
-            barangPoMasterPayload.push({
-                kode: item.kode,
-                nama: item.nama,
-                qty: item.qty,
-                satuan: item.satuan,
-                harga: item.harga,
-                jumlahHarga: item.jumlahHarga,
-                discount: item.discount,
-                step: 1,
-                isMaster: true,
+        if (poResult) {
+            req.body.barangPo.map(async (item: Omit<BarangPoDTO, "id">) => {
+                barangPoMasterPayload.push({
+                    kode: item.kode,
+                    nama: item.nama,
+                    qty: item.qty,
+                    satuan: item.satuan,
+                    harga: item.harga,
+                    jumlahHarga: item.jumlahHarga,
+                    discount: item.discount,
+                    step: 1,
+                    isMaster: true,
+                    poId: poResult.id,
+                    stokBarangId: item.stokBarangId,
+                    createdBy: item.createdBy
+                })
+            });
+            await barangPoService.create(barangPoMasterPayload);
+            const barangPoPayload: Omit<BarangPoDTO, "id">[] = [];
+            req.body.barangPo.map(async (item: Omit<BarangPoDTO, "id">) => {
+                barangPoPayload.push({
+                    kode: item.kode,
+                    nama: item.nama,
+                    qty: item.qty,
+                    satuan: item.satuan,
+                    harga: item.harga,
+                    jumlahHarga: item.jumlahHarga,
+                    discount: item.discount,
+                    step: 2,
+                    isMaster: false,
+                    poId: poResult.id,
+                    stokBarangId: item.stokBarangId,
+                    createdBy: item.createdBy
+                })
+            });
+            await barangPoService.create(barangPoPayload);
+            const pembayaranPayload = {
+                metode: req.body.pembayaran.metodePembayaran,
+                jumlahBayar: req.body.pembayaran.jumlahBayar,
+                nominal: 0,
+                totalPembayaran: req.body.pembayaran.totalPembayaran,
                 poId: poResult.id,
-                stokBarangId: item.stokBarangId,
-                createdBy: item.createdBy
-            })
-        });
-        await barangPoService.create(barangPoMasterPayload);
-        const barangPoPayload: Omit<BarangPoDTO, "id">[] = [];
-        req.body.barangPo.map(async (item: Omit<BarangPoDTO, "id">) => {
-            barangPoPayload.push({
-                kode: item.kode,
-                nama: item.nama,
-                qty: item.qty,
-                satuan: item.satuan,
-                harga: item.harga,
-                jumlahHarga: item.jumlahHarga,
-                discount: item.discount,
-                step: 2,
-                isMaster: false,
+                isApprove: req.body.pembayaran.isApprove,
+                approvedAt: req.body.pembayaran.approvedAt,
+                approvedBy: req.body.pembayaran.approvedBy,
+                createdBy: req.body.pembayaran.createdBy,
+                createdAt: req.body.pembayaran.createdAt
+            };
+            const pembayaranResult = await poService.createPembayaran(pembayaranPayload);
+            const riwayatPembayaranPayload = {
                 poId: poResult.id,
-                stokBarangId: item.stokBarangId,
-                createdBy: item.createdBy
-            })
-        });
-        await barangPoService.create(barangPoPayload);
-        const pembayaranPayload = {
-            metode: req.body.pembayaran.metodePembayaran,
-            jumlahBayar: req.body.pembayaran.jumlahBayar,
-            nominal: 0,
-            totalPembayaran: req.body.pembayaran.totalPembayaran,
-            poId: poResult.id,
-            isApprove: req.body.pembayaran.isApprove,
-            approvedAt: req.body.pembayaran.approvedAt,
-            approvedBy: req.body.pembayaran.approvedBy,
-            createdBy: req.body.pembayaran.createdBy,
-            createdAt: req.body.pembayaran.createdAt
-        };
-        const pembayaranResult = await poService.createPembayaran(pembayaranPayload);
-        const riwayatPembayaranPayload = {
-            poId: poResult.id,
-            pembayaranPoId: pembayaranResult.id,
-            createdBy: req.body.pembayaran.createdBy,
-            createdAt: req.body.pembayaran.createdAt,
-            description: `PO baru ditambahkan dengan total pembayaran ${thousandLimiter(req.body.pembayaran.totalPembayaran, 'Rp')}`
+                pembayaranPoId: pembayaranResult.id,
+                createdBy: req.body.pembayaran.createdBy,
+                createdAt: req.body.pembayaran.createdAt,
+                description: `PO baru ditambahkan dengan total pembayaran ${thousandLimiter(req.body.pembayaran.totalPembayaran, 'Rp')}`
+            }
+            await poService.createRiwayatPembayaran(riwayatPembayaranPayload);
         }
-        await poService.createRiwayatPembayaran(riwayatPembayaranPayload);
         return res.status(201).send({
             'status': 'success',
             'code': 201,
@@ -94,27 +105,31 @@ export async function updateMaster(req: Request, res: Response) {
     try {
         const poService = new PoService();
         const barangPoService = new BarangPoService();
-        const poResult = await poService.create(req.body.po);
-        const barangPoPayload: Omit<BarangPoDTO, "id">[] = [];
-        req.body.barangPo.map(async (item: Omit<BarangPoDTO, "id">) => {
-            const barangPoLastStep = await barangPoService.findLastStep(poResult.id, item.stokBarangId)
-            console.log(barangPoLastStep, "<====BarangPoLastStep");
-            barangPoPayload.push({
-                kode: item.kode,
-                nama: item.nama,
-                qty: item.qty,
-                satuan: item.satuan,
-                harga: item.harga,
-                jumlahHarga: item.jumlahHarga,
-                discount: item.discount,
-                step: Number(barangPoLastStep?.step) + 1,
-                isMaster: true,
-                poId: poResult.id,
-                stokBarangId: item.stokBarangId,
-                createdBy: item.createdBy
-            })
+        const poResult = await poService.create(req.body.po).catch((e) => {
+            return e;
         });
-        await barangPoService.create(barangPoPayload)
+        const barangPoPayload: Omit<BarangPoDTO, "id">[] = [];
+        if (poResult) {
+            req.body.barangPo.map(async (item: Omit<BarangPoDTO, "id">) => {
+                const barangPoLastStep = await barangPoService.findLastStep(poResult.id, item.stokBarangId)
+                console.log(barangPoLastStep, "<====BarangPoLastStep");
+                barangPoPayload.push({
+                    kode: item.kode,
+                    nama: item.nama,
+                    qty: item.qty,
+                    satuan: item.satuan,
+                    harga: item.harga,
+                    jumlahHarga: item.jumlahHarga,
+                    discount: item.discount,
+                    step: Number(barangPoLastStep?.step) + 1,
+                    isMaster: true,
+                    poId: poResult.id,
+                    stokBarangId: item.stokBarangId,
+                    createdBy: item.createdBy
+                })
+            });
+            await barangPoService.create(barangPoPayload)
+        }
         return res.status(201).send({
             'status': 'success',
             'code': 201,

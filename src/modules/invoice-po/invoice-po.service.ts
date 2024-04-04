@@ -102,7 +102,8 @@ class InvoicePoService {
    }
 
     async findAll({search, page, perPage, ptId, projectId, suratJalanPoId}: IParamsQuery) {
-        const skipPage = Number(page) * 10 - 10;
+        const sizePerPage = perPage ? Number(perPage) : 100;                                         
+        const skipPage = sizePerPage * page - sizePerPage;
         const totalCount = await InvoicePo.count();
         const totalPages = Math.ceil(totalCount / perPage);
         let result;
@@ -377,17 +378,17 @@ class InvoicePoService {
             }
         }
         
-
+        debug(result, ">>> result");
         const newResult: any[] = [];
         await Promise.all(result.map(async(item) => {
             const ptData = await Pt.findUnique({
                 where: {
-                    id: item.Po?.ptId
+                    id: item?.Po?.ptId
                 }
             });
             const projectData = await Project.findUnique({
                 where: {
-                    id: item.Po?.projectId
+                    id: item?.Po?.projectId
                 }
             });
             const barangSjData = await BarangSuratJalanPo.findMany({
@@ -400,7 +401,7 @@ class InvoicePoService {
             await Promise.all(barangSjData.map(async(bsj) => {
                 const barangPoData = await BarangPo.findFirst({
                     where: {
-                        poId: item.Po.id,
+                        poId: item?.Po?.id,
                         kode: bsj.kode
                     }
                 });

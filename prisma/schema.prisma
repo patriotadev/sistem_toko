@@ -84,6 +84,7 @@ model SubMenu {
 
 model StokBarang {
   id                        String                      @id @default(cuid())
+  ctId                      Int                         @unique @default(autoincrement())
   kode                      String                      @unique
   nama                      String
   jumlah                    Int
@@ -219,8 +220,8 @@ model InvoicePo {
   SuratJalanPo        SuratJalanPo          @relation(fields: [suratJalanPoId], references: [id])
   suratJalanPoId      String
   status              String
-  Po                  Po                    @relation(fields: [poId], references: [id])
-  poId                String
+  Po                  Po?                   @relation(fields: [poId], references: [id])
+  poId                String?
   createdAt           DateTime              @default(now())
   updatedBy           String?
   updatedAt           DateTime?             @default(now())

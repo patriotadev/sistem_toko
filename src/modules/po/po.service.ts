@@ -1,6 +1,7 @@
 import PoDTO, { PembayaranPoDTO } from "./dto/po.dto";
 import { IParamsQuery } from "./interfaces/po.interface";
 import prisma from "../../libs/prisma";
+import PrismaErrorHandler from "../../helpers/error-message";
 const Po = prisma.po;
 const PembayaranPo = prisma.pembayaranPo;
 const BarangSuratJalanPo = prisma.barangSuratJalanPo;
@@ -18,7 +19,7 @@ class PoService {
             ptId,
             projectId,
         } = payload;
-        const result = await Po.create({
+        return await Po.create({
             data : {
                 noPo,
                 tanggal: new Date(tanggal),
@@ -28,8 +29,10 @@ class PoService {
                 status: 'Belum Diambil',
                 statusSJ: 'Parsial'
             }
-        });
-        return result;
+        }).catch((err) => {
+            debug(err, ">>> err");
+            return PrismaErrorHandler(err)
+        })
     }
 
     async createPembayaran(payload: PembayaranPoDTO) {
@@ -110,7 +113,8 @@ class PoService {
     }
 
     async findAll({search, page, perPage, ptId, projectId, status}: IParamsQuery) {
-        const skipPage = Number(page) * 10 - 10;
+        const sizePerPage = perPage ? Number(perPage) : 100;                                         
+        const skipPage = sizePerPage * page - sizePerPage;
         const totalCount = await Po.count();
         const totalPages = Math.ceil(totalCount / perPage);
         let result;

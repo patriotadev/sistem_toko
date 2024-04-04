@@ -20,7 +20,8 @@ class UserService {
     }
 
     async findAll({search, page, perPage}: IParamsQuery) {
-        const skipPage = Number(page) * 10 - 10;
+        const sizePerPage = perPage ? Number(perPage) : 100;                                         
+        const skipPage = sizePerPage * page - sizePerPage;
         const totalCount = await User.count();
         const totalPages = Math.ceil(totalCount / perPage);
         let result;

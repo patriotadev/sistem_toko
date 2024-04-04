@@ -83,7 +83,8 @@ class SuratJalanPoService {
     }
 
     async findAll({search, page, perPage, status, poId, ptId, projectId}: IParamsQuery) {
-        const skipPage = Number(page) * 10 - 10;
+        const sizePerPage = perPage ? Number(perPage) : 100;                                         
+        const skipPage = sizePerPage * page - sizePerPage;
         const totalCount = await SuratJalanPo.count();
         const totalPages = Math.ceil(totalCount / perPage);
         let result;
@@ -1457,18 +1458,24 @@ class SuratJalanPoService {
 
         let newResult: any[] = [];
         await Promise.all(result.map(async(item) => {
-            const ptData = await Pt.findUnique({
-                where: {
-                    id: item.Po?.ptId
-                }
-            });
-            newResult.push({
-                ...item,
-                Pt: ptData
-            })
+            if (item.Po) {
+                const ptData = await Pt.findUnique({
+                    where: {
+                        id: item.Po?.ptId
+                    }
+                });
+                newResult.push({
+                    ...item,
+                    Pt: ptData
+                });
+            } else {
+                newResult.push({
+                    ...item,
+                });
+            }
         }));
         
-        debug(result, ">>> res surat jalan po");
+        debug(newResult, ">>> res surat jalan po");
         return {
             data: newResult,
             document: {

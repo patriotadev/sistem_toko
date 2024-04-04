@@ -16,6 +16,8 @@ import PenjualanRouter from '../modules/penjualan/penjualan.route';
 import InvoicePenjualanRouter from '../modules/invoice-penjualan/invoice-penjualan.route';
 import NotaPenjualanRouter from '../modules/nota-penjualan/nota-penjualan.route';
 import LaporanPoRouter from '../modules/laporan-po/laporan-po.route';
+import { AppValidationRequest } from '../middlewares/app-middleware';
+const debug = require('debug')('hbpos-server:index-route');
 
 const router = express.Router();
 
@@ -23,23 +25,23 @@ router.get('/health', (req: Request, res: Response) => {
     res.send('App is healthy');
 });
 
-router.use('/api/auth', AuthRouter);
-router.use('/api/stok', StokRouter);
-router.use('/api/toko', TokoRouter);
-router.use('/api/pt', PtRouter);
-router.use('/api/role', RoleRouter);
-router.use('/api/project', ProjectRouter);
-router.use('/api/po', PoRouter);
-router.use('/api/surat-jalan-po', SuratJalanPoRouter);
-router.use('/api/barang-po', BarangPoRouter);
-router.use('/api/invoice-po', InvoicePoRouter);
-router.use('/api/tanda-terima-nota', TandaTerimaNotaRouter);
-router.use('/api/barang-surat-jalan-po', BarangSuratJalanPoRouter);
-router.use('/api/user', UserRouter);
-router.use('/api/penjualan', PenjualanRouter);
-router.use('/api/invoice-penjualan', InvoicePenjualanRouter);
-router.use('/api/nota-penjualan', NotaPenjualanRouter);
-router.use('/api/laporan-po', LaporanPoRouter);
+router.use('/api/auth', AppValidationRequest, AuthRouter);
+router.use('/api/stok', AppValidationRequest, StokRouter);
+router.use('/api/toko', AppValidationRequest, TokoRouter);
+router.use('/api/pt', AppValidationRequest, PtRouter);
+router.use('/api/role', AppValidationRequest, RoleRouter);
+router.use('/api/project', AppValidationRequest, ProjectRouter);
+router.use('/api/po', AppValidationRequest, PoRouter);
+router.use('/api/surat-jalan-po', AppValidationRequest, SuratJalanPoRouter);
+router.use('/api/barang-po', AppValidationRequest, BarangPoRouter);
+router.use('/api/invoice-po', AppValidationRequest, InvoicePoRouter);
+router.use('/api/tanda-terima-nota', AppValidationRequest, TandaTerimaNotaRouter);
+router.use('/api/barang-surat-jalan-po', AppValidationRequest, BarangSuratJalanPoRouter);
+router.use('/api/user', AppValidationRequest, UserRouter);
+router.use('/api/penjualan', AppValidationRequest, PenjualanRouter);
+router.use('/api/invoice-penjualan', AppValidationRequest, InvoicePenjualanRouter);
+router.use('/api/nota-penjualan', AppValidationRequest, NotaPenjualanRouter);
+router.use('/api/laporan-po', AppValidationRequest, LaporanPoRouter);
 
 router.use((req: Request, res: Response) => {
     res.status(400).send('Invalid route.');

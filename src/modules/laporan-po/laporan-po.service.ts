@@ -10,7 +10,8 @@ class LaporanPoService {
 
     async getDaftarTagihan(payload: any) {
         const { page, perPage, ptId, projectId } = payload;
-        const skipPage = Number(page) * 10 - 10;
+        const sizePerPage = perPage ? Number(perPage) : 100;                                         
+        const skipPage = sizePerPage * page - sizePerPage;
         const totalCount = await Pt.count();
         const totalPages = Math.ceil(totalCount / perPage);
         

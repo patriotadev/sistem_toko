@@ -40,7 +40,8 @@ class ProjectService {
     }
 
     async findAll({ search, page, perPage, ptId }: IParamsQuery) {
-        const skipPage = Number(page) * 10 - 10;
+        const sizePerPage = perPage ? Number(perPage) : 100;                                         
+        const skipPage = sizePerPage * page - sizePerPage;
         const totalCount = await Project.count();
         const totalPages = Math.ceil(totalCount / perPage);
         let result;
