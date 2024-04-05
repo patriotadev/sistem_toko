@@ -22,7 +22,7 @@ export default class AuthService {
             tokoId: payload.tokoId
         },
             process.env.ACCESS_TOKEN as string,
-            { expiresIn: "15m" }
+            { expiresIn: "10m" }
         );
        
         return token;
