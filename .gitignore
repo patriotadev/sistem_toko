@@ -5,5 +5,5 @@ prisma/migrations
 tsconfig.json
 dist
 
-Dockerfile
-docker-compose.yaml
+# Dockerfile
+# docker-compose.yaml
