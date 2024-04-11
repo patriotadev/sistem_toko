@@ -138,7 +138,7 @@ class StokService {
                                 }
     
                             ],
-                            // isPo: false
+                            // isPo: false 
                         },
                         skip: skipPage,
                         take: Number(perPage),
@@ -153,7 +153,7 @@ class StokService {
                     result = await StokBarang.findMany({
                         skip: skipPage,
                         where: {
-                            // isPo: false
+                            // isPo: false 
                         },
                         take: Number(perPage),
                         include: {
