@@ -138,7 +138,7 @@ class StokService {
                                 }
     
                             ],
-                            isPo: false
+                            // isPo: false 
                         },
                         skip: skipPage,
                         take: Number(perPage),
@@ -153,7 +153,7 @@ class StokService {
                     result = await StokBarang.findMany({
                         skip: skipPage,
                         where: {
-                            isPo: false
+                            // isPo: false 
                         },
                         take: Number(perPage),
                         include: {
@@ -183,7 +183,7 @@ class StokService {
                                 }
     
                             ],
-                            isPo: false
+                            // isPo: false
                         },
                         skip: skipPage,
                         take: Number(perPage),
@@ -198,7 +198,7 @@ class StokService {
                     result = await StokBarang.findMany({
                         where: {
                             tokoId,
-                            isPo: false
+                            // isPo: false
                         },
                         skip: skipPage,
                         take: Number(perPage),
@@ -482,6 +482,7 @@ class StokService {
                 hargaJual,
                 updatedBy,
                 // tokoId,
+                isPo: Number(jumlahPo) < 1 ? false : true,
                 jumlahPo,
                 updatedAt: new Date()
             }
