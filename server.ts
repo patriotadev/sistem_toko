@@ -1,4 +1,4 @@
-import express, {Express, Request, Response} from 'express';
+import express, {Express, Request, Response, NextFunction} from 'express';
 import bodyParser from 'body-parser';
 import AppRouter from './src/router';
 import cors from 'cors';
@@ -6,7 +6,6 @@ require('dotenv').config();
 const debug = require('debug')('hbpos-server:server');
 const PORT: number = Number(process.env.PORT);
 const app: Express = express();
-
 
 app.use(cors());
 app.use(express.urlencoded({extended: true}));
