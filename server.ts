@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-app.use(AppRouter);
+app.use(AppRouter); 
 
 app.listen(PORT, () => {
     debug('\x1b[36m',`Server is running on ${process.env.HOST_URL}:${process.env.PORT}`);
