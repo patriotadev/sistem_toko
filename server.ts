@@ -7,7 +7,6 @@ const debug = require('debug')('hbpos-server:server');
 const PORT: number = Number(process.env.PORT);
 const app: Express = express();
 
-
 app.use(cors());
 app.use(express.urlencoded({extended: true}));
 app.use(bodyParser.json());

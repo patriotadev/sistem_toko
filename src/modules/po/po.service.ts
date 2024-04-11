@@ -5,6 +5,7 @@ import PrismaErrorHandler from "../../helpers/error-message";
 const Po = prisma.po;
 const PembayaranPo = prisma.pembayaranPo;
 const BarangSuratJalanPo = prisma.barangSuratJalanPo;
+const BarangPo = prisma.barangPo;
 const SuratJalanPo = prisma.suratJalanPo;
 const RiwayatPembayaranPo = prisma.riwayatPembayaranPo;
 const debug = require('debug')('hbpos-server:po-service');
@@ -507,6 +508,11 @@ class PoService {
             }
         });
         await PembayaranPo.deleteMany({
+            where: {
+                poId: id
+            }
+        });
+        await BarangPo.deleteMany({
             where: {
                 poId: id
             }
