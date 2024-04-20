@@ -78,15 +78,13 @@ class PenjualanService {
     }
 
     async findAll({search, page, perPage, tokoId, dateStart, dateEnd}: IParamsQuery) {
-        const skipPage = Number(page) * 10 - 10;
+        const sizePerPage = perPage ? Number(perPage) : 100;                                         
+        const skipPage = sizePerPage * page - sizePerPage;
         const totalCount = await Penjualan.count();
         const totalPages = Math.ceil(totalCount / perPage);
         const startDate = String(dateStart);
         const endDate = String(dateEnd);
         let result;
-        console.log(dateStart);
-        console.log("tokoID", tokoId);
-        console.log("search", search);
 
         if (tokoId === 'all' && search === 'undefined' && startDate === 'null' && endDate === 'null') {
             result = await Penjualan.findMany({
@@ -104,7 +102,7 @@ class PenjualanService {
         } else if (tokoId === 'all' && search !== 'undefined' && startDate === 'null' && endDate === 'null') {
             result = await Penjualan.findMany({
                 where: {
-                    namaPelanggan: {
+                    nomor: {
                         contains: search,
                         mode: 'insensitive'
                     }
@@ -142,7 +140,7 @@ class PenjualanService {
         } else if (tokoId === 'all' && search !== 'undefined' && startDate !== 'null' && endDate !== 'null') {
             result = await Penjualan.findMany({
                 where: {
-                    namaPelanggan: {
+                    nomor: {
                         contains: search,
                         mode: 'insensitive'
                     },
@@ -183,7 +181,7 @@ class PenjualanService {
         } else if (tokoId !== 'all' && search !== 'undefined' && startDate === 'null' && endDate === 'null') {
             result = await Penjualan.findMany({
                 where: {
-                    namaPelanggan: {
+                    nomor: {
                         contains: search,
                         mode: 'insensitive'
                     },
@@ -223,7 +221,7 @@ class PenjualanService {
         } else if (tokoId !== 'all' && search !== 'undefined' && startDate !== 'null' && endDate !== 'null') {
             result = await Penjualan.findMany({
                 where: {
-                    namaPelanggan: {
+                    nomor: {
                         contains: search,
                         mode: 'insensitive'
                     },

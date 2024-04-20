@@ -28,7 +28,7 @@ class PoService {
                 ptId,
                 projectId,
                 status: 'Belum Diambil',
-                statusSJ: 'Parsial'
+                statusSJ: 'Outstanding'
             }
         }).catch((err) => {
             debug(err, ">>> err");
@@ -418,7 +418,7 @@ class PoService {
                 sj,
                 totalBarangPo,
                 totalBarangSJ,
-                statusSJ: totalBarangPo > totalBarangSJ ? 'Parsial' : 'Selesai' 
+                statusSJ: totalBarangSJ < 1  ? 'Outstanding' : totalBarangSJ > 0 && totalBarangPo > totalBarangSJ ? 'Parsial' : 'Selesai' 
             })
         }));
 

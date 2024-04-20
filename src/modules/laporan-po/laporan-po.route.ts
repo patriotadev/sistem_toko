@@ -1,7 +1,8 @@
 import express from 'express';
-import { getDaftarTagihan } from './laporan-po.controller';
+import { getDaftarTagihan, getLaporanPenjualan } from './laporan-po.controller';
 const router = express.Router();
 
 router.get('/', getDaftarTagihan);
+router.get('/penjualan', getLaporanPenjualan);
 
 export default router;
