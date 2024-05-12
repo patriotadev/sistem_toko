@@ -405,12 +405,12 @@ class InvoicePoService {
                         kode: bsj.kode
                     }
                 });
-                bsjData.push({
-                    ...bsj,
-                    harga: barangPoData?.harga
-                });
                 if (barangPoData) {
-                    totalJumlah += bsj.qty * barangPoData?.harga - barangPoData?.discount
+                    bsjData.push({
+                        ...bsj,
+                        harga: barangPoData.harga - Number(barangPoData.discount)
+                    });
+                    totalJumlah += (bsj.qty * barangPoData?.harga) - Number(barangPoData?.discount)
                 }
             }))
             newResult.push({

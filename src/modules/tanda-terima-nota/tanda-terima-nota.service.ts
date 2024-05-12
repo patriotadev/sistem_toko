@@ -14,7 +14,8 @@ const Po = prisma.po;
 const Pt = prisma.pt
 const BarangSuratJalanPo = prisma.barangSuratJalanPo;
 const BarangPo = prisma.barangPo;
-const SuratJalanPo = prisma.suratJalanPo
+const SuratJalanPo = prisma.suratJalanPo;
+const debug = require('debug')('hbpos-server:tanda-terima-nota-service');
 
 class TandaTerimaNotaService {
     async create(payload: TandaTerimaNotaDTO) {
@@ -97,6 +98,7 @@ class TandaTerimaNotaService {
                 }
             })
         }));
+        debug(payload, ">>> payload nota");
         const result = await TandaTerimaNotaList.createMany({
             data: [...(payload as [])]
         });
@@ -272,7 +274,7 @@ class TandaTerimaNotaService {
                         }
                     });
                     if (barangPoData) {
-                        totalJumlah += bsj.qty * barangPoData?.harga - barangPoData?.discount
+                        totalJumlah += bsj.qty * barangPoData?.harga - Number(barangPoData?.discount)
                     }
                 }))
                 newNotaList.push({
@@ -310,7 +312,7 @@ class TandaTerimaNotaService {
     }
 
     async updateOneById(id: string, payload: TandaTerimaNotaDTO) {
-        const { tanggal, jatuhTempo, updatedBy } = payload;
+        const { tanggal, jatuhTempo, updatedBy, ptId, projectId, createdBy } = payload;
         const result = await TandaTerimaNota.update({
             where: {
                 id
@@ -319,7 +321,10 @@ class TandaTerimaNotaService {
                 tanggal,
                 jatuhTempo: Number(jatuhTempo),
                 updatedBy,
-                updatedAt: new Date()
+                updatedAt: new Date(),
+                ptId,
+                projectId,
+                createdBy
             }
         });
         return result;

@@ -9,6 +9,10 @@ const BarangPo = prisma.barangPo;
 const BarangPenjualan = prisma.barangPenjualan;
 const Penjualan = prisma.penjualan;
 const StokBarang = prisma.stokBarang;
+const PT = prisma.pt;
+const Project = prisma.project;
+const User = prisma.user;
+const Toko = prisma.toko;
 const PembayaranPenjualan = prisma.pembayaranPenjualan;
 const debug = require('debug')('hbpos-server:laporan-po-service');
 
@@ -257,6 +261,19 @@ class LaporanPoService {
             data: resultData,
         }
     }
+
+    async getMasterReport () {
+        const ptCount = await PT.count();
+        const projectCount = await Project.count();
+        const userCount = await User.count();
+        const tokoCount = await Toko.count();
+        return {
+            ptCount,
+            projectCount,
+            userCount,
+            tokoCount
+        }
+    } 
 }
 
 export default LaporanPoService;
