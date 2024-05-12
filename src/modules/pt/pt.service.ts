@@ -44,6 +44,9 @@ class PtService {
                 take: Number(perPage),
                 orderBy: {
                     createdAt: 'desc'
+                },
+                include: {
+                    Project: true
                 }
             });
         } else {
@@ -52,6 +55,9 @@ class PtService {
                 take: Number(perPage),
                 orderBy: {
                     createdAt: 'desc'
+                },
+                include: {
+                    Project: true
                 }
             });
         }

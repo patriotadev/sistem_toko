@@ -2,11 +2,15 @@ import SuratJalanPoDTO from "./dto/surat-jalan-po.dto";
 import { IParamsQuery, ISuratJalanPo } from "./interfaces/surat-jalan-po.interface";
 import prisma from "../../libs/prisma";
 import moment from "moment";
+import { nanoid } from "nanoid";
+import PrismaErrorHandler from "../../helpers/error-message";
 const SuratJalanPo = prisma.suratJalanPo;
 const Toko = prisma.toko;
 const StokBarang = prisma.stokBarang;
 const BarangSuratJalanPo = prisma.barangSuratJalanPo;
 const Pt = prisma.pt;
+const Project = prisma.project;
+const Po = prisma.po;
 const debug = require('debug')('hbpos-server:surat-jalan-po-controller');
 
 class SuratJalanPoService {
@@ -24,6 +28,54 @@ class SuratJalanPoService {
                 }
             });
             return result;
+        }
+    }
+
+    async createPoDirect (payload: any) {
+        const { po, suratJalan } = payload;
+        const findProjectExist = await Project.findFirst({
+            where: {
+                nama: '[Tanpa No. Po]'
+            }
+        });
+        if (findProjectExist) {
+            return await Po.create({
+                data : {
+                    noPo: `[${nanoid(6).toUpperCase()}]`,
+                    tanggal: new Date(),
+                    createdBy: suratJalan.createdBy,
+                    ptId: po.ptId,
+                    projectId: findProjectExist.id,
+                    status: 'Belum Diambil',
+                    statusSJ: 'Outstanding'
+                }
+            }).catch((err) => {
+                debug(err, ">>> err");
+                return PrismaErrorHandler(err)
+            })
+        } else {
+            const newProject = await Project.create({
+                data: {
+                    nama: '[Tanpa No. Po]',
+                    ptId: po.ptId,
+                    createdBy: suratJalan.createdBy
+                }
+            });
+
+            return await Po.create({
+                data : {
+                    noPo: `[${nanoid(6)}]`,
+                    tanggal: new Date(),
+                    createdBy: suratJalan.createdBy,
+                    ptId: po.ptId,
+                    projectId: newProject.id,
+                    status: 'Belum Diambil',
+                    statusSJ: 'Outstanding'
+                }
+            }).catch((err) => {
+                debug(err, ">>> err");
+                return PrismaErrorHandler(err)
+            })
         }
     }
 
@@ -1475,7 +1527,6 @@ class SuratJalanPoService {
             }
         }));
         
-        debug(newResult, ">>> res surat jalan po");
         return {
             data: newResult,
             document: {

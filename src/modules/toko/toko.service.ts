@@ -60,7 +60,8 @@ class TokoService {
                 skip: skipPage,
                 take: Number(perPage),
                 include: {
-                    User: true
+                    User: true,
+                    StokBarang: true
                 }
             });
         } else {
@@ -68,7 +69,8 @@ class TokoService {
                 skip: skipPage,
                 take: Number(perPage),
                 include: {
-                    User: true
+                    User: true,
+                    StokBarang: true
                 }
             });
         }

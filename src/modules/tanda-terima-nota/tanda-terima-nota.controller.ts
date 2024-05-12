@@ -78,9 +78,15 @@ export async function updateTandaTerimaNotaById(req: Request, res: Response) {
     try {
         const tandaTerimaNotaService = new TandaTerimaNotaService();
         await tandaTerimaNotaService.updateOneById(req.body.id, req.body);
-         // const poListPayload: InvoicePoListDTO[] = [];
+        const invoicePoListPayload: Omit<NotaListDTO, "id">[] = [];
+        req.body.invoicePoListPayload.forEach((item: IInvoicePo) => {
+            invoicePoListPayload.push({
+                tandaTerimaNotaId: req.body.id,
+                invoicePoId: item.id,
+            });
+        });
         await tandaTerimaNotaService.deleteManyTandaTerimaNotaList(req.body.id)
-        await tandaTerimaNotaService.createNotaList(req.body.invoicePoListPayload);
+        await tandaTerimaNotaService.createNotaList(invoicePoListPayload);
         return res.status(200).send({
             'status': 'success',
             'code': 200,

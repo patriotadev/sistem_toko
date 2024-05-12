@@ -36,6 +36,7 @@ class StokService {
             const newGenerateCode = `${generateCode?.split('-')[0]}-${counter}`
             debug(generateCode, ">>> generateCode");
             debug(newGenerateCode, ">>> newGenerateCode");
+            debug(item, ">>> item stokk");
             if (generateCode) {
                 if (item.kode === item.nama) {
                     await StokBarang.create({
