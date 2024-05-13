@@ -408,7 +408,8 @@ class InvoicePoService {
                 if (barangPoData) {
                     bsjData.push({
                         ...bsj,
-                        harga: barangPoData.harga - Number(barangPoData.discount)
+                        harga: barangPoData.harga,
+                        discount: barangPoData.discount
                     });
                     totalJumlah += (bsj.qty * barangPoData?.harga) - Number(barangPoData?.discount)
                 }
