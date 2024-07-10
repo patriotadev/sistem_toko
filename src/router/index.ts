@@ -16,6 +16,7 @@ import PenjualanRouter from '../modules/penjualan/penjualan.route';
 import InvoicePenjualanRouter from '../modules/invoice-penjualan/invoice-penjualan.route';
 import NotaPenjualanRouter from '../modules/nota-penjualan/nota-penjualan.route';
 import LaporanPoRouter from '../modules/laporan-po/laporan-po.route';
+import PaymentAccountRouter from '../modules/payment-account/payment-account.route';
 import { AppValidationRequest } from '../middlewares/app-middleware';
 import verifyToken from '../middlewares/verify-token';
 const debug = require('debug')('hbpos-server:index-route');
@@ -43,6 +44,7 @@ router.use('/api/penjualan', AppValidationRequest, verifyToken, PenjualanRouter)
 router.use('/api/invoice-penjualan', AppValidationRequest, verifyToken, InvoicePenjualanRouter);
 router.use('/api/nota-penjualan', AppValidationRequest, verifyToken, NotaPenjualanRouter);
 router.use('/api/laporan-po', AppValidationRequest, verifyToken, LaporanPoRouter);
+router.use('/api/payment-account', AppValidationRequest, verifyToken, PaymentAccountRouter);
 
 router.use((req: Request, res: Response) => {
     res.status(400).send('Invalid route.');

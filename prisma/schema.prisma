@@ -438,3 +438,13 @@ model RiwayatPembayaranPo {
   createdAt      DateTime
   description    String
 }
+
+model Pelanggan {
+  id        String   @id @default(cuid())
+  nama      String
+  alamat    String
+  noHp      String
+  Deposit   Int
+  createdBy String
+  createdAt DateTime @default(now())
+}

@@ -106,11 +106,7 @@ class StokService {
         const {search, page, perPage, tokoId, tab} = payload;
         const sizePerPage = perPage ? Number(perPage) : 100;                                         
         const skipPage = sizePerPage * page - sizePerPage;
-        const totalCount = tab === TabStatus.STOK_TERSEDIA ? await StokBarang.count({
-            where: {
-                isPo: false
-            }
-        }) : await StokBarang.count({
+        const totalCount = tab === TabStatus.STOK_TERSEDIA ? await StokBarang.count() : await StokBarang.count({
             where: {
                 jumlahPo: {
                     gt: 0
