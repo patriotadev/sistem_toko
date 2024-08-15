@@ -256,7 +256,8 @@ class TandaTerimaNotaService {
                         id: nl.invoicePoId
                     },
                     include: {
-                        SuratJalanPo: true
+                        SuratJalanPo: true,
+                        Po: true,
                     }
                 });
 
@@ -279,6 +280,7 @@ class TandaTerimaNotaService {
                 }))
                 newNotaList.push({
                     ...nl,
+                    noPo: invoiceData?.Po?.noPo,
                     totalJumlah
                 })
             }))
